@@ -12,6 +12,11 @@ const ROUTES: { keywords: string[]; path: string; label: string }[] = [
   { keywords: ["recruiter", "simulation", "simulator", "heatmap", "scan"], path: "/recruiter-sim", label: "Recruiter Sim" },
   { keywords: ["dna", "personality", "traits"], path: "/dna", label: "Resume DNA" },
   { keywords: ["copilot", "rewrite", "studio", "assistant", "ai"], path: "/copilot", label: "Copilot" },
+  { keywords: ["linkedin", "sync", "gap", "profile"], path: "/linkedin-sync", label: "LinkedIn Sync" },
+  { keywords: ["versions", "manager", "vault", "multi"], path: "/versions", label: "Resume Versions" },
+  { keywords: ["voice builder", "voice resume", "build resume", "speak"], path: "/voice-builder", label: "Voice Builder" },
+  { keywords: ["cover letter", "letter", "cover"], path: "/cover-letter", label: "Cover Letter" },
+  { keywords: ["benchmark", "compare", "top ten", "top 10", "competitor"], path: "/benchmark", label: "Benchmark" },
 ];
 
 const COMMANDS_HELP = [
