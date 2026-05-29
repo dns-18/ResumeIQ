@@ -6,8 +6,11 @@ import { Button } from "./ui/button";
 const nav = [
   { to: "/", label: "Home" },
   { to: "/dashboard", label: "Dashboard" },
-  { to: "/recruiter-sim", label: "Recruiter Sim" },
-  { to: "/dna", label: "Resume DNA" },
+  { to: "/versions", label: "Versions" },
+  { to: "/voice-builder", label: "Voice Build" },
+  { to: "/cover-letter", label: "Cover Letter" },
+  { to: "/linkedin-sync", label: "LinkedIn" },
+  { to: "/benchmark", label: "Benchmark" },
   { to: "/copilot", label: "Copilot" },
 ];
 

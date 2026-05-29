@@ -9,6 +9,11 @@ import Dashboard from "./pages/Dashboard.tsx";
 import RecruiterSim from "./pages/RecruiterSim.tsx";
 import DnaPage from "./pages/DnaPage.tsx";
 import CopilotPage from "./pages/CopilotPage.tsx";
+import LinkedInSync from "./pages/LinkedInSync.tsx";
+import ResumeVersions from "./pages/ResumeVersions.tsx";
+import VoiceBuilder from "./pages/VoiceBuilder.tsx";
+import CoverLetter from "./pages/CoverLetter.tsx";
+import Benchmark from "./pages/Benchmark.tsx";
 import VoiceCommand from "./components/VoiceCommand";
 
 const queryClient = new QueryClient();
@@ -26,6 +31,11 @@ const App = () => (
           <Route path="/recruiter-sim" element={<RecruiterSim />} />
           <Route path="/dna" element={<DnaPage />} />
           <Route path="/copilot" element={<CopilotPage />} />
+          <Route path="/linkedin-sync" element={<LinkedInSync />} />
+          <Route path="/versions" element={<ResumeVersions />} />
+          <Route path="/voice-builder" element={<VoiceBuilder />} />
+          <Route path="/cover-letter" element={<CoverLetter />} />
+          <Route path="/benchmark" element={<Benchmark />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
