@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import RecruiterSim from "./pages/RecruiterSim.tsx";
 import DnaPage from "./pages/DnaPage.tsx";
 import CopilotPage from "./pages/CopilotPage.tsx";
+import VoiceCommand from "./components/VoiceCommand";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <VoiceCommand />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
