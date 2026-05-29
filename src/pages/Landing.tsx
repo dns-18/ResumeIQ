@@ -1,200 +1,367 @@
-import { motion } from "framer-motion";
+import { FormEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight, Brain, Eye, Dna, Rocket, Sparkles, Target, Trophy,
-  Workflow, Mic, Users, Wand2, BarChart3, Shield, Zap
-} from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
-import { GlassCard } from "@/components/GlassCard";
-import { ScoreRing } from "@/components/ScoreRing";
-import { CopilotPanel } from "@/components/CopilotPanel";
+import { ArrowRight, Globe, Instagram, Mic, MicOff, Twitter } from "lucide-react";
 
-const features = [
-  { icon: Eye, title: "Recruiter Simulation", desc: "Watch the 6-second scan with heatmaps and AI commentary.", color: "from-neon-violet to-neon-pink" },
-  { icon: Brain, title: "AI Career Copilot", desc: "Conversational rewriting tuned to any target role.", color: "from-neon-cyan to-neon-violet" },
-  { icon: Dna, title: "Resume Personality DNA", desc: "Classify tone, leadership traits & recruiter perception.", color: "from-neon-pink to-neon-amber" },
-  { icon: Shield, title: "ATS Battlefield", desc: "Compare against Workday, Greenhouse, Lever, Taleo.", color: "from-neon-lime to-neon-cyan" },
-  { icon: BarChart3, title: "Skill Gap Forecast", desc: "See which skills are rising and falling in your field.", color: "from-neon-amber to-neon-pink" },
-  { icon: Target, title: "Interview Predictor", desc: "Callback probability with AI mock questions.", color: "from-neon-violet to-neon-cyan" },
-  { icon: Wand2, title: "Rewrite Studio", desc: "Inline AI suggestions on every line of your resume.", color: "from-neon-cyan to-neon-lime" },
-  { icon: Workflow, title: "Job Match Universe", desc: "Galaxy view of jobs orbiting your profile.", color: "from-neon-pink to-neon-violet" },
-  { icon: Trophy, title: "Gamified Progression", desc: "XP, streaks, achievements as your score grows.", color: "from-neon-amber to-neon-lime" },
-  { icon: Users, title: "Live Collaboration", desc: "Share with mentors, get live comments and cursors.", color: "from-neon-cyan to-neon-pink" },
-  { icon: Mic, title: "Voice Analysis", desc: "Hear your report read with conversational AI.", color: "from-neon-violet to-neon-amber" },
-  { icon: Sparkles, title: "Storytelling Engine", desc: "Turn your career into a recruiter-grade narrative.", color: "from-neon-lime to-neon-violet" },
-];
+const VIDEO_URL =
+  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_115001_bcdaa3b4-03de-47e7-ad63-ae3e392c32d4.mp4";
 
-const stats = [
-  { v: "3.7x", l: "More interview calls" },
-  { v: "94%", l: "ATS pass rate" },
-  { v: "120k+", l: "Resumes optimized" },
-  { v: "<6s", l: "Recruiter scan modeled" },
-];
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+
+type SpeechRecognitionInstance = EventTarget & {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: SpeechRecognitionEventShape) => void) | null;
+  onend: (() => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
+};
+
+type SpeechRecognitionEventShape = {
+  results: {
+    [index: number]: {
+      [index: number]: {
+        transcript: string;
+      };
+      isFinal: boolean;
+    };
+    length: number;
+  };
+};
+
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }
+}
+
+const fadeVideo = (
+  video: HTMLVideoElement,
+  targetOpacity: number,
+  duration: number,
+  animationRef: MutableRefObject<number | null>,
+) => {
+  if (animationRef.current) {
+    cancelAnimationFrame(animationRef.current);
+  }
+
+  const startOpacity = Number.parseFloat(video.style.opacity || "0");
+  const startedAt = performance.now();
+
+  const animate = (now: number) => {
+    const progress = Math.min((now - startedAt) / duration, 1);
+    video.style.opacity = String(startOpacity + (targetOpacity - startOpacity) * progress);
+
+    if (progress < 1) {
+      animationRef.current = requestAnimationFrame(animate);
+      return;
+    }
+
+    animationRef.current = null;
+  };
+
+  animationRef.current = requestAnimationFrame(animate);
+};
+
+const useLoopingVideoFade = () => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const fadingOutRef = useRef(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return undefined;
+
+    video.style.opacity = "0";
+
+    const fadeIn = () => {
+      fadingOutRef.current = false;
+      fadeVideo(video, 1, 500, animationRef);
+    };
+
+    const fadeOutBeforeLoop = () => {
+      if (!video.duration || fadingOutRef.current) return;
+
+      if (video.duration - video.currentTime <= 0.55) {
+        fadingOutRef.current = true;
+        fadeVideo(video, 0, 500, animationRef);
+      }
+    };
+
+    const restartAfterFade = () => {
+      video.style.opacity = "0";
+      window.setTimeout(() => {
+        video.currentTime = 0;
+        void video.play();
+        fadeIn();
+      }, 100);
+    };
+
+    video.addEventListener("loadeddata", fadeIn);
+    video.addEventListener("timeupdate", fadeOutBeforeLoop);
+    video.addEventListener("ended", restartAfterFade);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      video.removeEventListener("loadeddata", fadeIn);
+      video.removeEventListener("timeupdate", fadeOutBeforeLoop);
+      video.removeEventListener("ended", restartAfterFade);
+    };
+  }, []);
+
+  return videoRef;
+};
+
+const useVoiceResume = () => {
+  const [listening, setListening] = useState(false);
+  const [message, setMessage] = useState("Say: set role product designer, add skill React, or analyze resume.");
+  const [resume, setResume] = useState({
+    name: "Dhruv",
+    role: "AI Resume Builder",
+    skills: ["React", "TypeScript", "Career AI"],
+    experience: ["Built a voice-guided resume workflow with cinematic onboarding."],
+    score: 82,
+  });
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  const applyCommand = (rawCommand: string) => {
+    const command = rawCommand.trim();
+    const lowerCommand = command.toLowerCase();
+
+    if (!command) return;
+    setMessage(`Heard: "${command}"`);
+
+    if (lowerCommand.startsWith("set name ")) {
+      const name = command.slice(9).trim();
+      setResume((current) => ({ ...current, name: name || current.name }));
+      return;
+    }
+
+    if (lowerCommand.startsWith("set role ")) {
+      const role = command.slice(9).trim();
+      setResume((current) => ({ ...current, role: role || current.role }));
+      return;
+    }
+
+    if (lowerCommand.startsWith("add skill ")) {
+      const skill = command.slice(10).trim();
+      setResume((current) => ({
+        ...current,
+        skills: skill ? Array.from(new Set([...current.skills, skill])) : current.skills,
+        score: Math.min(current.score + 3, 99),
+      }));
+      return;
+    }
+
+    if (lowerCommand.startsWith("add experience ")) {
+      const experience = command.slice(15).trim();
+      setResume((current) => ({
+        ...current,
+        experience: experience ? [experience, ...current.experience].slice(0, 3) : current.experience,
+        score: Math.min(current.score + 5, 99),
+      }));
+      return;
+    }
+
+    if (lowerCommand.includes("analyze resume") || lowerCommand.includes("improve resume")) {
+      setResume((current) => ({ ...current, score: Math.min(current.score + 8, 99) }));
+      setMessage("AI pass complete: strengthened keywords, impact language, and ATS clarity.");
+      return;
+    }
+
+    setMessage("Try: set name, set role, add skill, add experience, or analyze resume.");
+  };
+
+  const toggleListening = () => {
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!Recognition) {
+      setMessage("Voice commands need Chrome, Edge, or another browser with Web Speech support.");
+      return;
+    }
+
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+
+    const recognition = new Recognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+
+    recognition.onresult = (event) => {
+      const latest = event.results[event.results.length - 1];
+      if (latest?.isFinal) {
+        applyCommand(latest[0].transcript);
+      }
+    };
+    recognition.onerror = (event) => {
+      setListening(false);
+      setMessage(
+        event.error === "not-allowed"
+          ? "Microphone permission is blocked. Allow microphone access in the browser and try again."
+          : `Voice command stopped: ${event.error}.`,
+      );
+    };
+    recognition.onend = () => setListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setListening(true);
+    setMessage("Listening. Try: add skill leadership, set role product manager, analyze resume.");
+  };
+
+  return { applyCommand, listening, message, resume, toggleListening };
+};
 
 export default function Landing() {
+  const videoRef = useLoopingVideoFade();
+  const { applyCommand, listening, message, resume, toggleListening } = useVoiceResume();
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    applyCommand("analyze resume");
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      <Navbar />
+    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+      <video
+        ref={videoRef}
+        className="absolute inset-0 h-full w-full translate-y-[17%] object-cover"
+        src={VIDEO_URL}
+        muted
+        autoPlay
+        playsInline
+        preload="auto"
+      />
+      <div className="absolute inset-0 bg-black/45" />
+      <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-black/85 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/85 to-transparent" />
 
-      {/* HERO */}
-      <section className="relative px-4 pt-12 pb-32">
-        <div className="absolute inset-0 grid-bg pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
-        <div className="relative mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="text-center max-w-4xl mx-auto"
+      <div className="relative flex min-h-screen flex-col">
+        <nav className="relative z-20 px-6 py-6">
+          <div className="liquid-glass mx-auto flex max-w-5xl items-center justify-between rounded-full px-6 py-3">
+            <div className="flex items-center gap-8">
+              <Link to="/" className="flex items-center gap-2 text-lg font-semibold text-white" aria-label="ResumeIQ home">
+                <Globe size={24} />
+                <span>ResumeIQ</span>
+              </Link>
+              <div className="hidden items-center gap-8 md:flex">
+                {[
+                  { label: "Features", to: "/dashboard" },
+                  { label: "Pricing", to: "/benchmark" },
+                  { label: "About", to: "/copilot" },
+                ].map((item) => (
+                  <Link
+                    className="text-sm font-medium text-white/80 transition-colors hover:text-white"
+                    key={item.label}
+                    to={item.to}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link className="text-sm font-medium text-white" to="/dashboard">
+                Sign Up
+              </Link>
+              <Link className="liquid-glass rounded-full px-6 py-2 text-sm font-medium text-white" to="/dashboard">
+                Login
+              </Link>
+            </div>
+          </div>
+        </nav>
+
+        <section className="relative z-10 flex flex-1 -translate-y-[20%] flex-col items-center justify-center px-6 py-12 text-center">
+          <h1
+            className="mb-8 whitespace-nowrap text-5xl tracking-tight text-white md:text-6xl lg:text-7xl"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium mb-6"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-neon-lime animate-pulse" />
-              Now with Recruiter Simulation Engine v2 · Live
-            </motion.div>
+            Built for the curious
+          </h1>
 
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95]">
-              Beat the bots.
-              <br />
-              <span className="text-gradient animate-aurora">Land the interview.</span>
-            </h1>
-
-            <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              NeuroATS is the AI career intelligence platform that simulates real recruiters,
-              decodes your resume DNA, and rewrites your story in seconds.
+          <div className="w-full max-w-xl space-y-4">
+            <form className="liquid-glass flex items-center gap-3 rounded-full py-2 pl-6 pr-2" onSubmit={onSubmit}>
+              <input
+                className="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/40"
+                placeholder="Enter your email"
+                type="email"
+                aria-label="Email address"
+              />
+              <button className="rounded-full bg-white p-3 text-black" type="submit" aria-label="Submit email">
+                <ArrowRight size={20} />
+              </button>
+            </form>
+            <p className="px-4 text-sm leading-relaxed text-white">
+              Stay updated with the latest news and insights. Subscribe to our newsletter today and never miss out on
+              exciting updates.
             </p>
+            <Link
+              className="liquid-glass inline-flex rounded-full px-8 py-3 text-sm font-medium text-white transition-colors hover:bg-white/5"
+              to="/voice-builder"
+            >
+              Build with voice
+            </Link>
+          </div>
+        </section>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" className="bg-gradient-aurora animate-aurora text-background font-semibold text-base h-12 px-6 shadow-neon hover:opacity-90">
-                <Link to="/dashboard">
-                  Analyze my resume <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="h-12 px-6 glass border-border">
-                <Link to="/recruiter-sim">
-                  <Eye className="mr-2 h-4 w-4" /> See recruiter sim
-                </Link>
-              </Button>
+        <aside className="absolute bottom-24 right-6 z-20 hidden w-80 text-left lg:block">
+          <div className="liquid-glass rounded-[28px] p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.25em] text-white/45">Voice Resume AI</p>
+                <h2 className="text-lg font-semibold text-white">{resume.name}</h2>
+              </div>
+              <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-black">{resume.score}</span>
             </div>
-
-            <div className="mt-16 flex justify-center">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="relative"
-              >
-                <div className="absolute -inset-12 bg-gradient-glow blur-3xl opacity-60 animate-pulse-glow rounded-full" />
-                <div className="relative glass rounded-3xl p-10 shadow-elevated">
-                  <ScoreRing score={92} size={220} />
-                </div>
-                <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                  className="absolute -top-4 -right-6 glass rounded-xl px-3 py-2 text-xs flex items-center gap-2 shadow-glass"
-                >
-                  <Zap className="h-3.5 w-3.5 text-neon-amber" /> +18 pts this week
-                </motion.div>
-                <motion.div
-                  animate={{ y: [0, 8, 0] }}
-                  transition={{ duration: 5, repeat: Infinity }}
-                  className="absolute -bottom-2 -left-8 glass rounded-xl px-3 py-2 text-xs flex items-center gap-2 shadow-glass"
-                >
-                  <Trophy className="h-3.5 w-3.5 text-neon-lime" /> Streak: 7 days
-                </motion.div>
-              </motion.div>
-            </div>
-
-            <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4">
-              {stats.map((s, i) => (
-                <motion.div
-                  key={s.l}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="glass rounded-2xl p-5"
-                >
-                  <div className="font-display text-3xl font-bold text-gradient">{s.v}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{s.l}</div>
-                </motion.div>
+            <p className="text-sm text-white/70">{resume.role}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {resume.skills.map((skill) => (
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/80" key={skill}>
+                  {skill}
+                </span>
               ))}
             </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section className="relative px-4 py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs font-medium mb-4">
-              <Sparkles className="h-3 w-3" /> Twelve superpowers, one platform
-            </div>
-            <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight">
-              Not another ATS checker. <span className="text-gradient">A career co-pilot.</span>
-            </h2>
-            <p className="mt-4 text-muted-foreground">
-              Every feature is built around how modern recruiters actually evaluate candidates.
+            <p className="mt-4 text-sm leading-relaxed text-white/70">
+              {resume.experience[0] || "Add experience by voice."}
             </p>
+            <p className="mt-4 text-xs text-white/45">{message}</p>
+            <button
+              aria-pressed={listening}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-3 text-sm font-semibold text-black"
+              onClick={toggleListening}
+              type="button"
+            >
+              {listening ? <MicOff size={18} /> : <Mic size={18} />}
+              {listening ? "Stop listening" : "Start voice build"}
+            </button>
           </div>
+        </aside>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {features.map((f, i) => (
-              <GlassCard
-                key={f.title}
-                transition={{ delay: i * 0.04, duration: 0.5 }}
-                className="group hover:shadow-elevated cursor-pointer"
-              >
-                <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <f.icon className="h-5 w-5 text-background" />
-                </div>
-                <h3 className="font-display font-semibold text-lg">{f.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{f.desc}</p>
-              </GlassCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="px-4 py-24">
-        <div className="mx-auto max-w-5xl">
-          <GlassCard glow className="text-center p-12 md:p-20 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-glow opacity-50 animate-pulse-glow" />
-            <div className="relative">
-              <Rocket className="h-12 w-12 mx-auto text-gradient mb-6" />
-              <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight">
-                Ready to <span className="text-gradient">10x your callbacks?</span>
-              </h2>
-              <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-                Drop your resume. Get your AI report, recruiter simulation, and career DNA in under 30 seconds.
-              </p>
-              <Button asChild size="lg" className="mt-8 bg-gradient-aurora animate-aurora text-background font-semibold h-12 px-8 shadow-neon">
-                <Link to="/dashboard">Start free analysis <ArrowRight className="ml-1 h-4 w-4" /></Link>
-              </Button>
-            </div>
-          </GlassCard>
-        </div>
-      </section>
-
-      <footer className="px-4 py-10 border-t border-border">
-        <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div>© 2026 ResumeIQ — Built for the future of work.</div>
-          <div className="flex gap-6">
-            <Link to="/dashboard" className="hover:text-foreground">Dashboard</Link>
-            <Link to="/copilot" className="hover:text-foreground">Copilot</Link>
-            <Link to="/dna" className="hover:text-foreground">DNA</Link>
-          </div>
-        </div>
-      </footer>
-
-      <CopilotPanel />
-    </div>
+        <footer className="relative z-10 flex justify-center gap-4 pb-12">
+          {[
+            { icon: Instagram, label: "Instagram" },
+            { icon: Twitter, label: "Twitter" },
+            { icon: Globe, label: "Website" },
+          ].map(({ icon: Icon, label }) => (
+            <button
+              aria-label={label}
+              className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white"
+              key={label}
+              type="button"
+            >
+              <Icon size={20} />
+            </button>
+          ))}
+        </footer>
+      </div>
+    </main>
   );
 }
