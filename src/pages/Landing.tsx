@@ -185,7 +185,7 @@ export default function Landing() {
 
       <footer className="px-4 py-10 border-t border-border">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div>© 2026 NeuroATS — Built for the future of work.</div>
+          <div>© 2026 ResumeIQ — Built for the future of work.</div>
           <div className="flex gap-6">
             <Link to="/dashboard" className="hover:text-foreground">Dashboard</Link>
             <Link to="/copilot" className="hover:text-foreground">Copilot</Link>
