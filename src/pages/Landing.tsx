@@ -4,9 +4,12 @@ import {
   ArrowRight,
   Brain,
   CheckCircle2,
+  Clipboard,
+  Copy,
   FileText,
   Globe,
   Instagram,
+  Link2,
   Mic,
   MicOff,
   Shield,
@@ -59,6 +62,60 @@ const pricing = [
     text: "Recruiter simulation, benchmark insights, and guided interview prep.",
   },
 ];
+
+const keywordBank = [
+  "leadership",
+  "analytics",
+  "growth",
+  "strategy",
+  "stakeholder",
+  "roadmap",
+  "automation",
+  "collaboration",
+  "conversion",
+  "customer",
+  "product",
+  "data",
+  "revenue",
+  "operations",
+  "research",
+  "experimentation",
+  "retention",
+  "communication",
+  "optimization",
+  "delivery",
+];
+
+const inferCompanyFromUrl = (url: string) => {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    const cleaned = host.split(".")[0]?.replace(/[-_]/g, " ");
+    return cleaned ? cleaned.replace(/\b\w/g, (letter) => letter.toUpperCase()) : "your team";
+  } catch {
+    return "your team";
+  }
+};
+
+const buildGhostEmail = (url: string) => {
+  const company = inferCompanyFromUrl(url);
+  const normalized = url.toLowerCase();
+  const keywords = keywordBank
+    .filter((keyword) => normalized.includes(keyword) || ["strategy", "data", "product", "growth", "stakeholder"].includes(keyword))
+    .slice(0, 8);
+
+  return `Subject: Quick idea for ${company}
+
+Hi ${company} team,
+
+I found the role and noticed repeated emphasis around ${keywords.slice(0, 3).join(", ")}. That caught my attention because my recent work has centered on ${keywords[3] || "execution"}, ${keywords[4] || "collaboration"}, and measurable ${keywords[5] || "impact"}.
+
+I would be excited to bring a practical mix of ${keywords.slice(0, 5).join(", ")} to the team, especially where strong communication and fast delivery matter.
+
+Would you be open to a quick conversation this week? I can share a concise resume version mapped to the role's ATS language.
+
+Best,
+Dhruv`;
+};
 
 type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
 
@@ -279,22 +336,24 @@ const useVoiceResume = () => {
 export default function Landing() {
   const videoRef = useLoopingVideoFade();
   const { applyCommand, listening, message, resume, toggleListening } = useVoiceResume();
-  const [email, setEmail] = useState("");
+  const [jobUrl, setJobUrl] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
+  const [ghostEmail, setGhostEmail] = useState("");
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const trimmedEmail = email.trim();
+    const trimmedUrl = jobUrl.trim();
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      setEmailStatus("Enter a valid email to join the early access list.");
+    if (!/^https?:\/\/.+\..+/.test(trimmedUrl)) {
+      setEmailStatus("Paste a full job description URL to tune the email.");
       return;
     }
 
-    const existingEmails = JSON.parse(localStorage.getItem("resumeiq-emails") || "[]") as string[];
-    localStorage.setItem("resumeiq-emails", JSON.stringify(Array.from(new Set([...existingEmails, trimmedEmail]))));
-    setEmail("");
-    setEmailStatus("You are on the list. We will send ResumeIQ updates and launch access.");
+    const emailDraft = buildGhostEmail(trimmedUrl);
+    const existingDrafts = JSON.parse(localStorage.getItem("resumeiq-ghost-emails") || "[]") as string[];
+    localStorage.setItem("resumeiq-ghost-emails", JSON.stringify([emailDraft, ...existingDrafts].slice(0, 5)));
+    setGhostEmail(emailDraft);
+    setEmailStatus("ATS Ghost Writer matched the cold email to this company's job language.");
     applyCommand("analyze resume");
   };
 
@@ -338,34 +397,35 @@ export default function Landing() {
                 ))}
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <a className="text-sm font-medium text-white" href="#signup">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <a className="hidden text-sm font-medium text-white sm:inline" href="#signup">
                 Sign Up
               </a>
-              <Link className="liquid-glass rounded-full px-6 py-2 text-sm font-medium text-white" to="/dashboard">
+              <Link className="liquid-glass rounded-full px-4 py-2 text-sm font-medium text-white sm:px-6" to="/dashboard">
                 Login
               </Link>
             </div>
           </div>
         </nav>
 
-        <section className="relative z-10 flex flex-1 -translate-y-[20%] flex-col items-center justify-center px-6 py-12 text-center">
+        <section className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-16 text-center md:-translate-y-[20%] md:py-12">
           <h1
-            className="mb-8 whitespace-nowrap text-5xl tracking-tight text-white md:text-6xl lg:text-7xl"
+            className="mb-6 text-5xl tracking-tight text-white md:text-6xl lg:text-7xl"
             style={{ fontFamily: "'Instrument Serif', serif" }}
           >
-            Built for the curious
+            ATS Ghost Writer Email
           </h1>
 
-          <div className="w-full max-w-xl space-y-4">
+          <div className="w-full max-w-2xl space-y-4">
             <form className="liquid-glass flex items-center gap-3 rounded-full py-2 pl-6 pr-2" onSubmit={onSubmit}>
+              <Link2 className="hidden h-5 w-5 text-white/55 sm:block" />
               <input
                 className="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/40"
-                placeholder="Enter your email"
-                type="email"
-                aria-label="Email address"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                placeholder="Paste job description URL"
+                type="url"
+                aria-label="Job description URL"
+                value={jobUrl}
+                onChange={(event) => setJobUrl(event.target.value)}
               />
               <button className="rounded-full bg-white p-3 text-black" type="submit" aria-label="Submit email">
                 <ArrowRight size={20} />
@@ -373,9 +433,30 @@ export default function Landing() {
             </form>
             {emailStatus && <p className="px-4 text-sm font-medium text-white">{emailStatus}</p>}
             <p className="px-4 text-sm leading-relaxed text-white">
-              Stay updated with the latest news and insights. Subscribe to our newsletter today and never miss out on
-              exciting updates.
+              One input, one output: a ready-to-send cold email whose keyword density mirrors the ATS language of the exact company.
             </p>
+            {ghostEmail && (
+              <div className="liquid-glass max-h-56 overflow-auto rounded-[24px] p-5 text-left text-sm leading-6 text-white/85">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <span className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-white/45">
+                    <Clipboard className="h-4 w-4" />
+                    Ready to send
+                  </span>
+                  <button
+                    className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/15"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(ghostEmail);
+                      setEmailStatus("Copied the ATS-tuned cold email.");
+                    }}
+                    type="button"
+                    aria-label="Copy cold email"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </button>
+                </div>
+                <pre className="whitespace-pre-wrap font-sans">{ghostEmail}</pre>
+              </div>
+            )}
             <Link
               className="liquid-glass inline-flex rounded-full px-8 py-3 text-sm font-medium text-white transition-colors hover:bg-white/5"
               to="/voice-builder"

@@ -1,21 +1,21 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, MicOff, X, HelpCircle } from "lucide-react";
+import { Mic, MicOff, X, HelpCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 type SR = any;
 
 const ROUTES: { keywords: string[]; path: string; label: string }[] = [
-  { keywords: ["home", "landing", "start", "main"], path: "/", label: "Home" },
-  { keywords: ["dashboard", "analyze", "analyse", "analysis", "score"], path: "/dashboard", label: "Dashboard" },
+  { keywords: ["home", "landing", "start", "main", "hero"], path: "/", label: "Home" },
+  { keywords: ["dashboard", "analyze", "analyse", "analysis", "score", "ats dashboard"], path: "/dashboard", label: "Dashboard" },
   { keywords: ["recruiter", "simulation", "simulator", "heatmap", "scan"], path: "/recruiter-sim", label: "Recruiter Sim" },
-  { keywords: ["dna", "personality", "traits"], path: "/dna", label: "Resume DNA" },
-  { keywords: ["copilot", "rewrite", "studio", "assistant", "ai"], path: "/copilot", label: "Copilot" },
-  { keywords: ["linkedin", "sync", "gap", "profile"], path: "/linkedin-sync", label: "LinkedIn Sync" },
-  { keywords: ["versions", "manager", "vault", "multi"], path: "/versions", label: "Resume Versions" },
-  { keywords: ["voice builder", "voice resume", "build resume", "speak"], path: "/voice-builder", label: "Voice Builder" },
-  { keywords: ["cover letter", "letter", "cover"], path: "/cover-letter", label: "Cover Letter" },
+  { keywords: ["dna", "personality", "traits", "resume dna"], path: "/dna", label: "Resume DNA" },
+  { keywords: ["copilot", "rewrite", "studio", "assistant", "ai writer"], path: "/copilot", label: "Copilot" },
+  { keywords: ["linkedin", "linked in", "sync", "gap", "profile"], path: "/linkedin-sync", label: "LinkedIn Sync" },
+  { keywords: ["versions", "version", "manager", "vault", "multi"], path: "/versions", label: "Resume Versions" },
+  { keywords: ["voice builder", "voice build", "voice resume", "build resume", "speak", "speech builder"], path: "/voice-builder", label: "Voice Builder" },
+  { keywords: ["cover letter", "letter", "cover", "application letter"], path: "/cover-letter", label: "Cover Letter" },
   { keywords: ["benchmark", "compare", "top ten", "top 10", "competitor"], path: "/benchmark", label: "Benchmark" },
 ];
 
@@ -24,11 +24,22 @@ const COMMANDS_HELP = [
   '"Open recruiter simulation"',
   '"Show resume DNA"',
   '"Open copilot"',
+  '"Open voice build"',
+  '"Open cover letter"',
   '"Go home"',
+  '"Help"',
   '"Scroll down" / "Scroll up"',
   '"Scroll to top" / "Scroll to bottom"',
   '"Stop listening"',
 ];
+
+const normalizeCommand = (raw: string) =>
+  raw
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\b(open|show|take me to|go to|launch|start|visit|navigate to)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 export const VoiceCommand = () => {
   const navigate = useNavigate();
@@ -40,10 +51,17 @@ export const VoiceCommand = () => {
 
   const handleCommand = useCallback(
     (raw: string) => {
-      const cmd = raw.toLowerCase().trim();
+      const cmd = normalizeCommand(raw);
       if (!cmd) return;
 
+      if (/^(help|commands|what can i say)$/.test(cmd) || cmd.includes("voice help")) {
+        setShowHelp(true);
+        toast({ title: "Voice command help opened" });
+        return;
+      }
       if (/(stop|cancel|mute|quiet).*(listen|listening|voice)/.test(cmd) || cmd === "stop") {
+        listeningRef.current = false;
+        setListening(false);
         recognitionRef.current?.stop();
         return;
       }
@@ -117,13 +135,15 @@ export const VoiceCommand = () => {
       }
     };
     rec.onerror = (e: any) => {
+      if (e.error === "no-speech" || e.error === "aborted") return;
       if (e.error === "not-allowed") {
         toast({
           title: "Microphone blocked",
           description: "Allow mic access to use voice commands.",
         });
-        setListening(false);
       }
+      listeningRef.current = false;
+      setListening(false);
     };
     rec.onend = () => {
       if (listeningRef.current) {
@@ -151,14 +171,16 @@ export const VoiceCommand = () => {
   const toggle = async () => {
     if (!recognitionRef.current) return;
     if (listening) {
+      listeningRef.current = false;
       setListening(false);
       recognitionRef.current.stop();
     } else {
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true });
+        listeningRef.current = true;
         setListening(true);
         recognitionRef.current.start();
-        toast({ title: "Voice commands active", description: 'Try "go to dashboard"' });
+        toast({ title: "Voice commands active", description: 'Try "open voice build" or "open cover letter".' });
       } catch {
         toast({ title: "Microphone permission required" });
       }
@@ -221,6 +243,10 @@ export const VoiceCommand = () => {
                 <li key={c} className="font-mono">{c}</li>
               ))}
             </ul>
+            <div className="mt-3 flex items-center gap-2 rounded-xl bg-secondary/60 p-2 text-[11px] text-muted-foreground">
+              <CheckCircle2 className="h-3.5 w-3.5 text-neon-lime" />
+              Works from every page after mic access is allowed.
+            </div>
             <div className="mt-3 pt-3 border-t border-border text-[10px] text-muted-foreground">
               Shortcut: <kbd className="px-1.5 py-0.5 rounded bg-secondary text-foreground">Shift + V</kbd>
             </div>

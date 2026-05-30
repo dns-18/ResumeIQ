@@ -13,7 +13,7 @@ export const GlassCard = forwardRef<HTMLDivElement, Props>(
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={cn(
-        "glass rounded-2xl p-6 shadow-glass relative overflow-hidden",
+        "glass rounded-lg p-6 shadow-glass relative overflow-hidden",
         glow && "neon-border",
         className
       )}

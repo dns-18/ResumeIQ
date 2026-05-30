@@ -23,7 +23,7 @@ export const Navbar = () => {
       className="sticky top-0 z-50 w-full"
     >
       <div className="mx-auto max-w-7xl px-4 py-3">
-        <div className="glass rounded-2xl px-4 py-2.5 flex items-center justify-between shadow-glass">
+        <div className="glass rounded-full px-4 py-2.5 flex items-center justify-between shadow-glass">
           <Link to="/"><Logo /></Link>
           <nav className="hidden md:flex items-center gap-1">
             {nav.map((n) => {
@@ -32,14 +32,14 @@ export const Navbar = () => {
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`relative px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                  className={`relative px-3 py-1.5 text-sm rounded-full transition-colors ${
                     active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {active && (
                     <motion.span
                       layoutId="nav-pill"
-                      className="absolute inset-0 rounded-lg bg-secondary"
+                      className="absolute inset-0 rounded-full bg-white/10"
                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
                   )}
