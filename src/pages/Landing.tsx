@@ -12,7 +12,6 @@ import {
   Link2,
   Mail,
   Mic,
-  MicOff,
   Shield,
   Sparkles,
   Twitter,
@@ -225,39 +224,6 @@ Phone: ${phone.trim() || "[phone]"}
 LinkedIn: ${linkedInUrl.trim() || "[link]"}`;
 };
 
-type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
-
-type SpeechRecognitionInstance = EventTarget & {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start: () => void;
-  stop: () => void;
-  onresult: ((event: SpeechRecognitionEventShape) => void) | null;
-  onend: (() => void) | null;
-  onerror: ((event: { error: string }) => void) | null;
-};
-
-type SpeechRecognitionEventShape = {
-  resultIndex: number;
-  results: {
-    [index: number]: {
-      [index: number]: {
-        transcript: string;
-      };
-      isFinal: boolean;
-    };
-    length: number;
-  };
-};
-
-declare global {
-  interface Window {
-    SpeechRecognition?: SpeechRecognitionConstructor;
-    webkitSpeechRecognition?: SpeechRecognitionConstructor;
-  }
-}
-
 const fadeVideo = (
   video: HTMLVideoElement,
   targetOpacity: number,
@@ -337,113 +303,8 @@ const useLoopingVideoFade = () => {
   return videoRef;
 };
 
-const useVoiceResume = () => {
-  const [listening, setListening] = useState(false);
-  const [message, setMessage] = useState("Say: set role product designer, add skill React, or analyze resume.");
-  const [resume, setResume] = useState({
-    name: "Dhruv",
-    role: "AI Resume Builder",
-    skills: ["React", "TypeScript", "Career AI"],
-    experience: ["Built a voice-guided resume workflow with cinematic onboarding."],
-    score: 82,
-  });
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-
-  const applyCommand = (rawCommand: string) => {
-    const command = rawCommand.trim();
-    const lowerCommand = command.toLowerCase();
-
-    if (!command) return;
-    setMessage(`Heard: "${command}"`);
-
-    if (lowerCommand.startsWith("set name ")) {
-      const name = command.slice(9).trim();
-      setResume((current) => ({ ...current, name: name || current.name }));
-      return;
-    }
-
-    if (lowerCommand.startsWith("set role ")) {
-      const role = command.slice(9).trim();
-      setResume((current) => ({ ...current, role: role || current.role }));
-      return;
-    }
-
-    if (lowerCommand.startsWith("add skill ")) {
-      const skill = command.slice(10).trim();
-      setResume((current) => ({
-        ...current,
-        skills: skill ? Array.from(new Set([...current.skills, skill])) : current.skills,
-        score: Math.min(current.score + 3, 99),
-      }));
-      return;
-    }
-
-    if (lowerCommand.startsWith("add experience ")) {
-      const experience = command.slice(15).trim();
-      setResume((current) => ({
-        ...current,
-        experience: experience ? [experience, ...current.experience].slice(0, 3) : current.experience,
-        score: Math.min(current.score + 5, 99),
-      }));
-      return;
-    }
-
-    if (lowerCommand.includes("analyze resume") || lowerCommand.includes("improve resume")) {
-      setResume((current) => ({ ...current, score: Math.min(current.score + 8, 99) }));
-      setMessage("AI pass complete: strengthened keywords, impact language, and ATS clarity.");
-      return;
-    }
-
-    setMessage("Try: set name, set role, add skill, add experience, or analyze resume.");
-  };
-
-  const toggleListening = () => {
-    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!Recognition) {
-      setMessage("Voice commands need Chrome, Edge, or another browser with Web Speech support.");
-      return;
-    }
-
-    if (listening) {
-      recognitionRef.current?.stop();
-      setListening(false);
-      return;
-    }
-
-    const recognition = new Recognition();
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.lang = "en-US";
-
-    recognition.onresult = (event) => {
-      const latest = event.results[event.results.length - 1];
-      if (latest?.isFinal) {
-        applyCommand(latest[0].transcript);
-      }
-    };
-    recognition.onerror = (event) => {
-      setListening(false);
-      setMessage(
-        event.error === "not-allowed"
-          ? "Microphone permission is blocked. Allow microphone access in the browser and try again."
-          : `Voice command stopped: ${event.error}.`,
-      );
-    };
-    recognition.onend = () => setListening(false);
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setListening(true);
-    setMessage("Listening. Try: add skill leadership, set role product manager, analyze resume.");
-  };
-
-  return { applyCommand, listening, message, resume, toggleListening };
-};
-
 export default function Landing() {
   const videoRef = useLoopingVideoFade();
-  const { applyCommand, listening, message, resume, toggleListening } = useVoiceResume();
   const [jobUrl, setJobUrl] = useState("");
   const [applicantName, setApplicantName] = useState("");
   const [education, setEducation] = useState("");
@@ -486,7 +347,6 @@ export default function Landing() {
         ? "Email created for this LinkedIn job. Add the company/recruiter name or pasted JD text for even sharper targeting."
         : "ATS Ghost Writer matched the email to the role and your profile strengths.",
     );
-    applyCommand("analyze resume");
   };
 
   return (
@@ -540,7 +400,7 @@ export default function Landing() {
           </div>
         </nav>
 
-        <section className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-16 text-center md:-translate-y-[20%] md:py-12">
+        <section className="relative z-10 flex flex-1 flex-col items-center justify-start px-6 pb-12 pt-16 text-center md:pt-24 lg:pt-28">
           <h1
             className="mb-6 text-5xl tracking-tight text-white md:text-6xl lg:text-7xl"
             style={{ fontFamily: "'Instrument Serif', serif" }}
@@ -666,39 +526,6 @@ export default function Landing() {
             </Link>
           </div>
         </section>
-
-        <aside className="absolute bottom-24 right-6 z-20 hidden w-80 text-left lg:block">
-          <div className="liquid-glass rounded-[28px] p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-white/45">Voice Resume AI</p>
-                <h2 className="text-lg font-semibold text-white">{resume.name}</h2>
-              </div>
-              <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-black">{resume.score}</span>
-            </div>
-            <p className="text-sm text-white/70">{resume.role}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {resume.skills.map((skill) => (
-                <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/80" key={skill}>
-                  {skill}
-                </span>
-              ))}
-            </div>
-            <p className="mt-4 text-sm leading-relaxed text-white/70">
-              {resume.experience[0] || "Add experience by voice."}
-            </p>
-            <p className="mt-4 text-xs text-white/45">{message}</p>
-            <button
-              aria-pressed={listening}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-3 text-sm font-semibold text-black"
-              onClick={toggleListening}
-              type="button"
-            >
-              {listening ? <MicOff size={18} /> : <Mic size={18} />}
-              {listening ? "Stop listening" : "Start voice build"}
-            </button>
-          </div>
-        </aside>
 
         <footer className="relative z-10 flex justify-center gap-4 pb-12">
           {[
