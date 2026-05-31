@@ -84,34 +84,87 @@ const keywordBank = [
   "communication",
   "optimization",
   "delivery",
+  "frontend",
+  "backend",
+  "full stack",
+  "machine learning",
+  "typescript",
+  "react",
+  "node",
+  "python",
+  "cloud",
 ];
 
-const inferCompanyFromUrl = (url: string) => {
+type GhostEmailInput = {
+  jobSource: string;
+  profileContext: string;
+  targetName: string;
+};
+
+const titleCase = (value: string) => value.replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+const isUrl = (value: string) => /^https?:\/\/.+\..+/.test(value);
+
+const extractLinkedInJobId = (value: string) => value.match(/linkedin\.com\/jobs\/view\/(\d+)/i)?.[1];
+
+const inferCompanyFromUrl = (url: string, targetName: string) => {
+  if (targetName.trim()) return targetName.trim();
+  if (/linkedin\.com\/jobs\/view/i.test(url)) return "the hiring team";
+
   try {
     const host = new URL(url).hostname.replace(/^www\./, "");
-    const cleaned = host.split(".")[0]?.replace(/[-_]/g, " ");
-    return cleaned ? cleaned.replace(/\b\w/g, (letter) => letter.toUpperCase()) : "your team";
+    const cleaned = host
+      .split(".")[0]
+      ?.replace(/[-_]/g, " ")
+      .replace(/\b(jobs|careers|apply|workday|greenhouse|lever)\b/gi, "")
+      .trim();
+    return cleaned ? titleCase(cleaned) : "the hiring team";
   } catch {
-    return "your team";
+    return "the hiring team";
   }
 };
 
-const buildGhostEmail = (url: string) => {
-  const company = inferCompanyFromUrl(url);
-  const normalized = url.toLowerCase();
-  const keywords = keywordBank
-    .filter((keyword) => normalized.includes(keyword) || ["strategy", "data", "product", "growth", "stakeholder"].includes(keyword))
-    .slice(0, 8);
+const inferRoleLabel = (jobSource: string) => {
+  const linkedInJobId = extractLinkedInJobId(jobSource);
+  if (linkedInJobId) return `LinkedIn job #${linkedInJobId}`;
+  if (isUrl(jobSource)) return "the open role";
 
-  return `Subject: Quick idea for ${company}
+  const roleMatch = jobSource.match(/(?:role|title|position)\s*[:\-]\s*([^\n.,]+)/i);
+  return roleMatch?.[1]?.trim() || "the open role";
+};
 
-Hi ${company} team,
+const extractKeywords = (jobSource: string, profileContext: string) => {
+  const normalized = `${jobSource} ${profileContext}`.toLowerCase();
+  const profileTerms = profileContext
+    .split(/[,;\n]/)
+    .map((term) => term.trim())
+    .filter((term) => term.length > 2)
+    .slice(0, 6);
 
-I found the role and noticed repeated emphasis around ${keywords.slice(0, 3).join(", ")}. That caught my attention because my recent work has centered on ${keywords[3] || "execution"}, ${keywords[4] || "collaboration"}, and measurable ${keywords[5] || "impact"}.
+  const atsTerms = keywordBank.filter((keyword) => normalized.includes(keyword));
+  const fallbackTerms = ["strategy", "data", "product", "growth", "stakeholder", "delivery"];
 
-I would be excited to bring a practical mix of ${keywords.slice(0, 5).join(", ")} to the team, especially where strong communication and fast delivery matter.
+  return Array.from(new Set([...profileTerms, ...atsTerms, ...fallbackTerms])).slice(0, 9);
+};
 
-Would you be open to a quick conversation this week? I can share a concise resume version mapped to the role's ATS language.
+const buildGhostEmail = ({ jobSource, profileContext, targetName }: GhostEmailInput) => {
+  const company = isUrl(jobSource) ? inferCompanyFromUrl(jobSource, targetName) : targetName.trim() || "the hiring team";
+  const roleLabel = inferRoleLabel(jobSource);
+  const keywords = extractKeywords(jobSource, profileContext);
+  const topKeywords = keywords.slice(0, 5);
+  const profileLine =
+    profileContext.trim() ||
+    "React, TypeScript, AI tooling, resume optimization, voice workflows, and product-focused execution";
+
+  return `Subject: Application for ${roleLabel} - ${topKeywords.slice(0, 3).join(", ")}
+
+Hi ${company},
+
+I found ${roleLabel} and wanted to reach out directly. I mapped the posting against my LinkedIn/profile strengths, and the strongest overlap is ${topKeywords.join(", ")}.
+
+My profile is strongest in ${profileLine}. That background fits the role's ATS language around ${keywords.slice(3, 8).join(", ")}, and I can bring both hands-on execution and clear communication from day one.
+
+Could I send over a resume version tailored to this posting, or speak for 10 minutes this week? I would love to show how my skills line up with what your team is hiring for.
 
 Best,
 Dhruv`;
@@ -337,6 +390,10 @@ export default function Landing() {
   const videoRef = useLoopingVideoFade();
   const { applyCommand, listening, message, resume, toggleListening } = useVoiceResume();
   const [jobUrl, setJobUrl] = useState("");
+  const [targetName, setTargetName] = useState("");
+  const [profileContext, setProfileContext] = useState(
+    "React, TypeScript, AI resume builder, voice workflow, ATS optimization, product strategy",
+  );
   const [emailStatus, setEmailStatus] = useState("");
   const [ghostEmail, setGhostEmail] = useState("");
 
@@ -344,16 +401,24 @@ export default function Landing() {
     event.preventDefault();
     const trimmedUrl = jobUrl.trim();
 
-    if (!/^https?:\/\/.+\..+/.test(trimmedUrl)) {
-      setEmailStatus("Paste a full job description URL to tune the email.");
+    if (!trimmedUrl) {
+      setEmailStatus("Paste a LinkedIn job URL, job description, or recruiter post first.");
       return;
     }
 
-    const emailDraft = buildGhostEmail(trimmedUrl);
+    const emailDraft = buildGhostEmail({
+      jobSource: trimmedUrl,
+      profileContext: profileContext.trim(),
+      targetName: targetName.trim(),
+    });
     const existingDrafts = JSON.parse(localStorage.getItem("resumeiq-ghost-emails") || "[]") as string[];
     localStorage.setItem("resumeiq-ghost-emails", JSON.stringify([emailDraft, ...existingDrafts].slice(0, 5)));
     setGhostEmail(emailDraft);
-    setEmailStatus("ATS Ghost Writer matched the cold email to this company's job language.");
+    setEmailStatus(
+      extractLinkedInJobId(trimmedUrl)
+        ? "Email created for this LinkedIn job. Add the company/recruiter name or pasted JD text for even sharper targeting."
+        : "ATS Ghost Writer matched the email to the role and your profile strengths.",
+    );
     applyCommand("analyze resume");
   };
 
@@ -417,23 +482,42 @@ export default function Landing() {
           </h1>
 
           <div className="w-full max-w-2xl space-y-4">
-            <form className="liquid-glass flex items-center gap-3 rounded-full py-2 pl-6 pr-2" onSubmit={onSubmit}>
-              <Link2 className="hidden h-5 w-5 text-white/55 sm:block" />
-              <input
-                className="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/40"
-                placeholder="Paste job description URL"
-                type="url"
-                aria-label="Job description URL"
-                value={jobUrl}
-                onChange={(event) => setJobUrl(event.target.value)}
-              />
-              <button className="rounded-full bg-white p-3 text-black" type="submit" aria-label="Submit email">
-                <ArrowRight size={20} />
-              </button>
+            <form className="space-y-3" onSubmit={onSubmit}>
+              <div className="liquid-glass flex items-center gap-3 rounded-full py-2 pl-6 pr-2">
+                <Link2 className="hidden h-5 w-5 text-white/55 sm:block" />
+                <input
+                  className="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/40"
+                  placeholder="Paste LinkedIn job URL or JD text"
+                  type="text"
+                  aria-label="LinkedIn job URL or job description"
+                  value={jobUrl}
+                  onChange={(event) => setJobUrl(event.target.value)}
+                />
+                <button className="rounded-full bg-white p-3 text-black" type="submit" aria-label="Create email">
+                  <ArrowRight size={20} />
+                </button>
+              </div>
+              <div className="grid gap-3 md:grid-cols-[0.85fr_1.15fr]">
+                <input
+                  className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  placeholder="Company or recruiter name"
+                  type="text"
+                  aria-label="Company or recruiter name"
+                  value={targetName}
+                  onChange={(event) => setTargetName(event.target.value)}
+                />
+                <textarea
+                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  placeholder="Paste your LinkedIn summary or skills"
+                  aria-label="LinkedIn profile summary and skills"
+                  value={profileContext}
+                  onChange={(event) => setProfileContext(event.target.value)}
+                />
+              </div>
             </form>
             {emailStatus && <p className="px-4 text-sm font-medium text-white">{emailStatus}</p>}
             <p className="px-4 text-sm leading-relaxed text-white">
-              One input, one output: a ready-to-send cold email whose keyword density mirrors the ATS language of the exact company.
+              Paste a LinkedIn job URL, add your skills or profile summary, and get a ready-to-send cold email tuned to that role.
             </p>
             {ghostEmail && (
               <div className="liquid-glass max-h-56 overflow-auto rounded-[24px] p-5 text-left text-sm leading-6 text-white/85">
