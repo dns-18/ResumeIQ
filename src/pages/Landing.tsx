@@ -10,6 +10,7 @@ import {
   Globe,
   Instagram,
   Link2,
+  Mail,
   Mic,
   MicOff,
   Shield,
@@ -96,8 +97,15 @@ const keywordBank = [
 ];
 
 type GhostEmailInput = {
+  applicantName: string;
+  education: string;
   jobSource: string;
   profileContext: string;
+  proofHighlights: string;
+  portfolioUrl: string;
+  githubUrl: string;
+  phone: string;
+  linkedInUrl: string;
   targetName: string;
 };
 
@@ -106,6 +114,8 @@ const titleCase = (value: string) => value.replace(/\b\w/g, (letter) => letter.t
 const isUrl = (value: string) => /^https?:\/\/.+\..+/.test(value);
 
 const extractLinkedInJobId = (value: string) => value.match(/linkedin\.com\/jobs\/view\/(\d+)/i)?.[1];
+
+const extractEmailAddress = (value: string) => value.match(/[^\s<>]+@[^\s<>]+\.[^\s<>]+/)?.[0] || "";
 
 const inferCompanyFromUrl = (url: string, targetName: string) => {
   if (targetName.trim()) return targetName.trim();
@@ -147,27 +157,72 @@ const extractKeywords = (jobSource: string, profileContext: string) => {
   return Array.from(new Set([...profileTerms, ...atsTerms, ...fallbackTerms])).slice(0, 9);
 };
 
-const buildGhostEmail = ({ jobSource, profileContext, targetName }: GhostEmailInput) => {
+const pickSpecificArea = (jobSource: string, keywords: string[]) => {
+  const source = jobSource.toLowerCase();
+  if (source.includes("frontend") || source.includes("react")) return "frontend products";
+  if (source.includes("backend") || source.includes("api")) return "backend systems";
+  if (source.includes("data") || source.includes("analytics")) return "data-driven products";
+  if (source.includes("ai") || source.includes("machine learning")) return "AI tools";
+  return keywords[0] ? `${keywords[0]} work` : "software engineering";
+};
+
+const splitProofHighlights = (value: string) =>
+  value
+    .split(/\n|;/)
+    .map((item) => item.replace(/^[-*\d.)\s]+/, "").trim())
+    .filter(Boolean)
+    .slice(0, 3);
+
+const buildMailtoHref = (emailDraft: string, targetName: string) => {
+  const [subjectLine, ...bodyLines] = emailDraft.split("\n");
+  const subject = subjectLine.replace(/^Subject:\s*/i, "").trim();
+  const recipient = extractEmailAddress(targetName);
+  return `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join("\n").trim())}`;
+};
+
+const buildGhostEmail = ({
+  applicantName,
+  education,
+  githubUrl,
+  jobSource,
+  linkedInUrl,
+  phone,
+  portfolioUrl,
+  profileContext,
+  proofHighlights,
+  targetName,
+}: GhostEmailInput) => {
   const company = isUrl(jobSource) ? inferCompanyFromUrl(jobSource, targetName) : targetName.trim() || "the hiring team";
   const roleLabel = inferRoleLabel(jobSource);
   const keywords = extractKeywords(jobSource, profileContext);
-  const topKeywords = keywords.slice(0, 5);
-  const profileLine =
-    profileContext.trim() ||
-    "React, TypeScript, AI tooling, resume optimization, voice workflows, and product-focused execution";
+  const topKeywords = keywords.slice(0, 3);
+  const name = applicantName.trim() || "Your Name";
+  const educationLine = education.trim() || "a Computer Science student";
+  const profileLine = profileContext.trim() || "React, JavaScript, C++, and software engineering";
+  const highlights = splitProofHighlights(proofHighlights);
+  const proofLines = (highlights.length ? highlights : ["Built practical projects", "Solved DSA problems", "Strong interest in software engineering"])
+    .map((highlight) => `- ${highlight}`)
+    .join("\n");
+  const specificArea = pickSpecificArea(jobSource, keywords);
 
-  return `Subject: Application for ${roleLabel} - ${topKeywords.slice(0, 3).join(", ")}
+  return `Subject: ${name} - ${roleLabel}
 
 Hi ${company},
 
-I found ${roleLabel} and wanted to reach out directly. I mapped the posting against my LinkedIn/profile strengths, and the strongest overlap is ${topKeywords.join(", ")}.
+I'm ${name}, ${educationLine}. I came across ${company} and noticed your work in ${specificArea}. I'm reaching out because I've been building with ${topKeywords.join(", ") || profileLine} and would love to contribute while learning from your team.
 
-My profile is strongest in ${profileLine}. That background fits the role's ATS language around ${keywords.slice(3, 8).join(", ")}, and I can bring both hands-on execution and clear communication from day one.
+Quick proof:
+${proofLines}
 
-Could I send over a resume version tailored to this posting, or speak for 10 minutes this week? I would love to show how my skills line up with what your team is hiring for.
+Portfolio: ${portfolioUrl.trim() || "[link]"}
+GitHub: ${githubUrl.trim() || "[link]"}
 
-Best,
-Dhruv`;
+If there is an internship, trainee, or entry-level opportunity, I'd be grateful for a chance to discuss how I can contribute.
+
+Best regards,
+${name}
+Phone: ${phone.trim() || "[phone]"}
+LinkedIn: ${linkedInUrl.trim() || "[link]"}`;
 };
 
 type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
@@ -390,10 +445,15 @@ export default function Landing() {
   const videoRef = useLoopingVideoFade();
   const { applyCommand, listening, message, resume, toggleListening } = useVoiceResume();
   const [jobUrl, setJobUrl] = useState("");
+  const [applicantName, setApplicantName] = useState("");
+  const [education, setEducation] = useState("");
   const [targetName, setTargetName] = useState("");
-  const [profileContext, setProfileContext] = useState(
-    "React, TypeScript, AI resume builder, voice workflow, ATS optimization, product strategy",
-  );
+  const [profileContext, setProfileContext] = useState("");
+  const [proofHighlights, setProofHighlights] = useState("");
+  const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
+  const [phone, setPhone] = useState("");
+  const [linkedInUrl, setLinkedInUrl] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
   const [ghostEmail, setGhostEmail] = useState("");
 
@@ -407,8 +467,15 @@ export default function Landing() {
     }
 
     const emailDraft = buildGhostEmail({
+      applicantName: applicantName.trim(),
+      education: education.trim(),
       jobSource: trimmedUrl,
+      githubUrl: githubUrl.trim(),
+      linkedInUrl: linkedInUrl.trim(),
+      phone: phone.trim(),
+      portfolioUrl: portfolioUrl.trim(),
       profileContext: profileContext.trim(),
+      proofHighlights: proofHighlights.trim(),
       targetName: targetName.trim(),
     });
     const existingDrafts = JSON.parse(localStorage.getItem("resumeiq-ghost-emails") || "[]") as string[];
@@ -497,27 +564,70 @@ export default function Landing() {
                   <ArrowRight size={20} />
                 </button>
               </div>
-              <div className="grid gap-3 md:grid-cols-[0.85fr_1.15fr]">
+              <div className="grid gap-3 md:grid-cols-3">
                 <input
                   className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
-                  placeholder="Company or recruiter name"
+                  placeholder="Your name"
+                  type="text"
+                  aria-label="Your name"
+                  value={applicantName}
+                  onChange={(event) => setApplicantName(event.target.value)}
+                />
+                <input
+                  className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  placeholder="College + CGPA"
+                  type="text"
+                  aria-label="College and CGPA"
+                  value={education}
+                  onChange={(event) => setEducation(event.target.value)}
+                />
+                <input
+                  className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  placeholder="Recruiter, company, or email"
                   type="text"
                   aria-label="Company or recruiter name"
                   value={targetName}
                   onChange={(event) => setTargetName(event.target.value)}
                 />
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
                 <textarea
                   className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
-                  placeholder="Paste your LinkedIn summary or skills"
+                  placeholder="Write your skills manually, e.g. React, JavaScript, C++, frontend"
                   aria-label="LinkedIn profile summary and skills"
                   value={profileContext}
                   onChange={(event) => setProfileContext(event.target.value)}
                 />
+                <textarea
+                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  placeholder="Proof highlights, one per line"
+                  aria-label="Proof highlights"
+                  value={proofHighlights}
+                  onChange={(event) => setProofHighlights(event.target.value)}
+                />
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                {[
+                  { label: "Portfolio link", value: portfolioUrl, onChange: setPortfolioUrl },
+                  { label: "GitHub link", value: githubUrl, onChange: setGithubUrl },
+                  { label: "Phone number", value: phone, onChange: setPhone },
+                  { label: "LinkedIn profile link", value: linkedInUrl, onChange: setLinkedInUrl },
+                ].map((field) => (
+                  <input
+                    className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                    placeholder={field.label}
+                    type="text"
+                    aria-label={field.label}
+                    value={field.value}
+                    onChange={(event) => field.onChange(event.target.value)}
+                    key={field.label}
+                  />
+                ))}
               </div>
             </form>
             {emailStatus && <p className="px-4 text-sm font-medium text-white">{emailStatus}</p>}
             <p className="px-4 text-sm leading-relaxed text-white">
-              Paste a LinkedIn job URL, add your skills or profile summary, and get a ready-to-send cold email tuned to that role.
+              Write your own details manually and get a short recruiter-ready cold email with proof, links, and one clear ask.
             </p>
             {ghostEmail && (
               <div className="liquid-glass max-h-56 overflow-auto rounded-[24px] p-5 text-left text-sm leading-6 text-white/85">
@@ -537,6 +647,13 @@ export default function Landing() {
                   >
                     <Copy className="h-4 w-4" />
                   </button>
+                  <a
+                    className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/15"
+                    href={buildMailtoHref(ghostEmail, targetName)}
+                    aria-label="Open in email"
+                  >
+                    <Mail className="h-4 w-4" />
+                  </a>
                 </div>
                 <pre className="whitespace-pre-wrap font-sans">{ghostEmail}</pre>
               </div>
