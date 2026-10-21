@@ -426,7 +426,7 @@ export default function Landing() {
               </div>
               <div className="grid gap-3 md:grid-cols-3">
                 <input
-                  className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                   placeholder="Your name"
                   type="text"
                   aria-label="Your name"
@@ -434,7 +434,7 @@ export default function Landing() {
                   onChange={(event) => setApplicantName(event.target.value)}
                 />
                 <input
-                  className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                   placeholder="College + CGPA"
                   type="text"
                   aria-label="College and CGPA"
@@ -442,7 +442,7 @@ export default function Landing() {
                   onChange={(event) => setEducation(event.target.value)}
                 />
                 <input
-                  className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                   placeholder="Recruiter, company, or email"
                   type="text"
                   aria-label="Company or recruiter name"

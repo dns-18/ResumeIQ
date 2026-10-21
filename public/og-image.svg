@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="aurora" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d946ef" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+    <radialGradient id="glowCyan" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="glowMagenta" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d946ef" stop-opacity="0.14" />
+      <stop offset="100%" stop-color="#d946ef" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#050607" />
+  <circle cx="0" cy="0" r="560" fill="url(#glowCyan)" />
+  <circle cx="1200" cy="630" r="640" fill="url(#glowMagenta)" />
+  <text x="600" y="310" text-anchor="middle" font-family="Space Grotesk, Arial, sans-serif" font-size="96" font-weight="700" fill="url(#aurora)">ResumeIQ</text>
+  <text x="600" y="385" text-anchor="middle" font-family="Space Grotesk, Arial, sans-serif" font-size="34" fill="#a1a1aa">AI Resume Analysis &amp; Career Copilot</text>
+</svg>
