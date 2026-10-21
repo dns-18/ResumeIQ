@@ -6,6 +6,8 @@ import {
   ArrowRight,
   Brain,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Clipboard,
   Copy,
   FileText,
@@ -320,6 +322,7 @@ export default function Landing() {
   const [linkedInUrl, setLinkedInUrl] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
   const [ghostEmail, setGhostEmail] = useState("");
+  const [emailExpanded, setEmailExpanded] = useState(false);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -345,6 +348,7 @@ export default function Landing() {
     const existingDrafts = JSON.parse(localStorage.getItem("resumeiq-ghost-emails") || "[]") as string[];
     localStorage.setItem("resumeiq-ghost-emails", JSON.stringify([emailDraft, ...existingDrafts].slice(0, 5)));
     setGhostEmail(emailDraft);
+    setEmailExpanded(false);
     setEmailStatus(
       extractLinkedInJobId(trimmedUrl)
         ? "Email created for this LinkedIn job. Add the company/recruiter name or pasted JD text for even sharper targeting."
@@ -354,7 +358,7 @@ export default function Landing() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-black text-white">
-      <section id="top" className="relative min-h-screen overflow-hidden">
+      <section id="top" className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,hsl(220,24%,9%)_0%,hsl(220,18%,5%)_55%,#000000_100%)]">
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full translate-y-[17%] object-cover"
@@ -485,7 +489,7 @@ export default function Landing() {
                 />
                 <input
                   className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
-                  placeholder="Recruiter, company, or email"
+                  placeholder="Recruiter name or email"
                   type="text"
                   aria-label="Company or recruiter name"
                   value={targetName}
@@ -532,7 +536,7 @@ export default function Landing() {
               Write your own details manually and get a short recruiter-ready cold email with proof, links, and one clear ask.
             </p>
             {ghostEmail && (
-              <div className="liquid-glass max-h-56 overflow-auto rounded-[24px] p-5 text-left text-sm leading-6 text-white/85">
+              <div className="liquid-glass rounded-[24px] p-5 text-left text-sm leading-6 text-white/85">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <span className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-white/45">
                     <Clipboard className="h-4 w-4" />
@@ -557,7 +561,25 @@ export default function Landing() {
                     <Mail className="h-4 w-4" />
                   </a>
                 </div>
-                <pre className="whitespace-pre-wrap font-sans">{ghostEmail}</pre>
+                <div className={emailExpanded ? undefined : "max-h-40 overflow-auto"}>
+                  <pre className="whitespace-pre-wrap font-sans">{ghostEmail}</pre>
+                </div>
+                <button
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/15"
+                  onClick={() => setEmailExpanded((value) => !value)}
+                  type="button"
+                  aria-expanded={emailExpanded}
+                >
+                  {emailExpanded ? (
+                    <>
+                      Show less <ChevronUp className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      Show full email <ChevronDown className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
               </div>
             )}
             <Link

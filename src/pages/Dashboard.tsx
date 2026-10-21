@@ -68,9 +68,9 @@ export default function Dashboard() {
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Workspace</div>
             <h1 className="font-display text-3xl md:text-4xl font-bold">AI Analysis Dashboard</h1>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="glass border-border"><Download className="h-4 w-4 mr-2" />Export PDF</Button>
-            <Button className="bg-gradient-aurora animate-aurora text-background"><Sparkles className="h-4 w-4 mr-2" />New analysis</Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" className="glass flex-1 border-border sm:flex-none"><Download className="h-4 w-4 mr-2" />Export PDF</Button>
+            <Button className="bg-gradient-aurora animate-aurora flex-1 text-background sm:flex-none"><Sparkles className="h-4 w-4 mr-2" />New analysis</Button>
           </div>
         </motion.div>
 
