@@ -61,7 +61,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -75,7 +75,7 @@ export default function Dashboard() {
         </motion.div>
 
         {!analyzed ? (
-          <GlassCard glow className="p-8">
+          <GlassCard glow className="p-4 sm:p-8">
             <UploadZone onComplete={() => setAnalyzed(true)} />
           </GlassCard>
         ) : (

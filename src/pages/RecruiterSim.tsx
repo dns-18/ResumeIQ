@@ -30,7 +30,7 @@ export default function RecruiterSim() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Unique Feature</div>

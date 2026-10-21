@@ -494,14 +494,14 @@ export default function Landing() {
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 <textarea
-                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                   placeholder="Write your skills manually, e.g. React, JavaScript, C++, frontend"
                   aria-label="LinkedIn profile summary and skills"
                   value={profileContext}
                   onChange={(event) => setProfileContext(event.target.value)}
                 />
                 <textarea
-                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                   placeholder="Proof highlights, one per line"
                   aria-label="Proof highlights"
                   value={proofHighlights}
@@ -516,7 +516,7 @@ export default function Landing() {
                   { label: "LinkedIn profile link", value: linkedInUrl, onChange: setLinkedInUrl },
                 ].map((field) => (
                   <input
-                    className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                    className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                     placeholder={field.label}
                     type="text"
                     aria-label={field.label}
@@ -569,7 +569,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <footer className="relative z-10 flex justify-center gap-4 pb-12">
+        <footer className="relative z-10 flex justify-center gap-4 pb-24 md:pb-12">
           {[
             { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/" },
             { icon: Twitter, label: "Twitter", href: "https://x.com/" },

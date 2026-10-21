@@ -43,7 +43,7 @@ export default function CoverLetter() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Cover letter AI</div>
           <h1 className="font-display text-3xl md:text-4xl font-bold">Tailored. Human-Sounding. In Seconds.</h1>
@@ -54,7 +54,7 @@ export default function CoverLetter() {
           <GlassCard glow>
             <h3 className="font-display text-lg font-semibold flex items-center gap-2 mb-4"><Mail className="h-5 w-5 text-neon-violet" />Job details</h3>
             <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Input placeholder="Company" value={company} onChange={(e) => setCompany(e.target.value)} className="glass border-border" />
                 <Input placeholder="Role title" value={role} onChange={(e) => setRole(e.target.value)} className="glass border-border" />
               </div>
@@ -77,14 +77,14 @@ export default function CoverLetter() {
           </GlassCard>
 
           <GlassCard className="flex flex-col">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display text-lg font-semibold flex items-center gap-2"><Sparkles className="h-5 w-5 text-neon-pink" />Your letter</h3>
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-3">
+              <h3 className="font-display text-lg font-semibold flex items-center gap-2 min-w-0"><Sparkles className="h-5 w-5 shrink-0 text-neon-pink" />Your letter</h3>
               {letter && (
-                <div className="flex gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5">
                   <Badge variant="outline" className="text-neon-lime border-neon-lime/40">Human-score: 96%</Badge>
-                  <Button size="sm" variant="ghost" onClick={() => { navigator.clipboard.writeText(letter); toast({ title: "Copied" }); }}><Copy className="h-4 w-4" /></Button>
-                  <Button size="sm" variant="ghost"><Download className="h-4 w-4" /></Button>
-                  <Button size="sm" variant="ghost" onClick={generate}><RefreshCw className="h-4 w-4" /></Button>
+                  <Button size="sm" variant="ghost" className="h-10 w-10" onClick={() => { navigator.clipboard.writeText(letter); toast({ title: "Copied" }); }}><Copy className="h-4 w-4" /></Button>
+                  <Button size="sm" variant="ghost" className="h-10 w-10"><Download className="h-4 w-4" /></Button>
+                  <Button size="sm" variant="ghost" className="h-10 w-10" onClick={generate}><RefreshCw className="h-4 w-4" /></Button>
                 </div>
               )}
             </div>

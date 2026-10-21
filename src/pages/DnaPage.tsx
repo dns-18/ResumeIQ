@@ -24,7 +24,7 @@ export default function DnaPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <div>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Personality Analytics</div>
           <h1 className="font-display text-3xl md:text-4xl font-bold flex items-center gap-3">

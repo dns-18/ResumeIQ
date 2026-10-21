@@ -174,7 +174,7 @@ export default function VoiceBuilder() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+      <main className="mx-auto max-w-7xl space-y-6 px-4 pt-8 pb-28 md:py-8">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">No typing required</div>
           <h1 className="font-display text-3xl font-bold md:text-4xl">Voice Resume Builder</h1>
