@@ -1,5 +1,7 @@
 import { FormEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   ArrowRight,
   Brain,
@@ -11,6 +13,7 @@ import {
   Instagram,
   Link2,
   Mail,
+  Menu,
   Mic,
   Shield,
   Sparkles,
@@ -390,6 +393,45 @@ export default function Landing() {
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-10 w-10 text-white hover:bg-white/10 hover:text-white md:hidden" aria-label="Open menu">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="flex w-[min(320px,85vw)] flex-col border-white/10 p-0">
+                  <SheetTitle className="sr-only">Menu</SheetTitle>
+                  <div className="flex items-center gap-2 p-4 text-lg font-semibold text-foreground">
+                    <Globe size={24} />
+                    <span>ResumeIQ</span>
+                  </div>
+                  <nav className="flex flex-col gap-1 px-3">
+                    {[
+                      { label: "Features", to: "#features" },
+                      { label: "Pricing", to: "#pricing" },
+                      { label: "About", to: "#about" },
+                      { label: "Sign Up", to: "#signup" },
+                    ].map((item) => (
+                      <SheetClose asChild key={item.label}>
+                        <a
+                          href={item.to}
+                          className="flex min-h-11 items-center rounded-xl px-3 text-base font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                        >
+                          {item.label}
+                        </a>
+                      </SheetClose>
+                    ))}
+                    <SheetClose asChild>
+                      <Link
+                        to="/dashboard"
+                        className="flex min-h-11 items-center rounded-xl px-3 text-base font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                      >
+                        Login
+                      </Link>
+                    </SheetClose>
+                  </nav>
+                </SheetContent>
+              </Sheet>
               <a className="hidden text-sm font-medium text-white sm:inline" href="#signup">
                 Sign Up
               </a>
