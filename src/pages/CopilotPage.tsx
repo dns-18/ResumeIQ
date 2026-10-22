@@ -4,6 +4,7 @@ import { CopilotPanel } from "@/components/CopilotPanel";
 import { Wand2, Check, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const bullets = [
   { weak: "Helped manage marketing campaigns for products.", strong: "Led 6 cross-channel marketing campaigns generating $2.3M pipeline and 41% MQL lift in 2 quarters." },
@@ -12,18 +13,19 @@ const bullets = [
 ];
 
 export default function CopilotPage() {
+  usePageTitle("Copilot · ResumeIQ");
   const [applied, setApplied] = useState<number[]>([]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-5xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-5xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <div>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Studio</div>
           <h1 className="font-display text-3xl md:text-4xl font-bold flex items-center gap-3">
             <Wand2 className="h-8 w-8 text-neon-violet" /> Smart Rewrite Studio
           </h1>
-          <p className="text-muted-foreground mt-1">Hover any bullet — apply AI suggestions in a click.</p>
+          <p className="text-muted-foreground mt-1">Tap or hover any bullet — apply AI suggestions in a click.</p>
         </div>
 
         <GlassCard glow>
@@ -55,7 +57,7 @@ export default function CopilotPage() {
                         </div>
                         <button
                           onClick={() => setApplied([...applied, i])}
-                          className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gradient-aurora animate-aurora text-background text-xs font-semibold"
+                          className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 min-h-10 md:min-h-0 rounded-lg bg-gradient-aurora animate-aurora text-background text-xs font-semibold"
                         >
                           <Check className="h-3 w-3" /> Apply
                         </button>

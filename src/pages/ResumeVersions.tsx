@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 type Version = { id: string; name: string; role: string; score: number; applies: number; callbacks: number; updated: string; best?: boolean };
 
@@ -16,6 +17,7 @@ const initialVersions: Version[] = [
 ];
 
 export default function ResumeVersions() {
+  usePageTitle("Versions · ResumeIQ");
   const [versions, setVersions] = useState<Version[]>(initialVersions);
   const [selected, setSelected] = useState<string[]>(["v1", "v2"]);
 
@@ -33,7 +35,7 @@ export default function ResumeVersions() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Resume vault</div>
@@ -80,8 +82,8 @@ export default function ResumeVersions() {
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Updated {v.updated}</span>
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => duplicate(v)}><Copy className="h-3.5 w-3.5" /></Button>
-                      <Button size="sm" variant="ghost" onClick={() => remove(v.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      <Button size="sm" variant="ghost" className="h-10 w-10" aria-label="Duplicate version" onClick={() => duplicate(v)}><Copy className="h-3.5 w-3.5" /></Button>
+                      <Button size="sm" variant="ghost" className="h-10 w-10" aria-label="Delete version" onClick={() => remove(v.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                     </div>
                   </div>
                 </GlassCard>
@@ -99,7 +101,7 @@ export default function ResumeVersions() {
             <p className="text-sm text-muted-foreground py-6 text-center">Select at least 2 versions above to compare.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[560px] text-sm">
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-widest text-muted-foreground border-b border-border">
                     <th className="py-2 pr-4">Metric</th>

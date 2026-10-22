@@ -6,6 +6,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { Button } from "@/components/ui/button";
 import { ScoreRing } from "@/components/ScoreRing";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const sections = [
   { id: "header", label: "Header", x: "10%", y: "8%", w: "80%", h: "14%", attention: 95, comment: "Eye anchors here first — strong name & title contrast." },
@@ -16,6 +17,7 @@ const sections = [
 ];
 
 export default function RecruiterSim() {
+  usePageTitle("Recruiter Sim · ResumeIQ");
   const [step, setStep] = useState(-1);
   const [running, setRunning] = useState(false);
 
@@ -30,7 +32,7 @@ export default function RecruiterSim() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Unique Feature</div>

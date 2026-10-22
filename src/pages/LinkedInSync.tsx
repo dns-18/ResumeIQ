@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const gaps = [
   { type: "missing", side: "linkedin", text: "Promotion to Senior PM (2024) is on LinkedIn but missing from resume", action: "Import to resume" },
@@ -15,6 +16,7 @@ const gaps = [
 ];
 
 export default function LinkedInSync() {
+  usePageTitle("LinkedIn Sync · ResumeIQ");
   const [connected, setConnected] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
@@ -26,7 +28,7 @@ export default function LinkedInSync() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Profile sync</div>
           <h1 className="font-display text-3xl md:text-4xl font-bold">LinkedIn × Resume Gap Analysis</h1>
@@ -91,17 +93,17 @@ export default function LinkedInSync() {
             <GlassCard>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-display text-xl font-semibold flex items-center gap-2"><Sparkles className="h-5 w-5 text-neon-pink" />Detected gaps & suggestions</h3>
-                <Button size="sm" className="bg-gradient-aurora animate-aurora text-background"><Plus className="h-4 w-4 mr-1" />Import all</Button>
+                <Button size="sm" className="bg-gradient-aurora animate-aurora text-background h-10 shrink-0"><Plus className="h-4 w-4 mr-1" />Import all</Button>
               </div>
               <div className="space-y-2.5">
                 {gaps.map((g, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-secondary/40 hover:bg-secondary/70 transition-colors">
+                    className="flex flex-col items-start gap-3 p-3 rounded-xl bg-secondary/40 hover:bg-secondary/70 transition-colors sm:flex-row sm:items-center">
                     {g.type === "missing" ? <AlertTriangle className="h-4 w-4 mt-0.5 text-neon-amber shrink-0" /> :
                      g.type === "mismatch" ? <AlertTriangle className="h-4 w-4 mt-0.5 text-neon-pink shrink-0" /> :
                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-neon-lime shrink-0" />}
-                    <div className="flex-1 text-sm">{g.text}</div>
-                    <Button size="sm" variant="ghost" className="text-neon-cyan hover:text-neon-cyan">
+                    <div className="flex-1 min-w-0 text-sm">{g.text}</div>
+                    <Button size="sm" variant="ghost" className="text-neon-cyan hover:text-neon-cyan h-10 shrink-0">
                       {g.action} <ArrowRight className="h-3 w-3 ml-1" />
                     </Button>
                   </motion.div>

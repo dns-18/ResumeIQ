@@ -205,7 +205,7 @@ export const VoiceCommand = () => {
   if (!supported) return null;
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start gap-2">
+    <div className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-[max(1.5rem,env(safe-area-inset-left))] z-50 flex flex-col items-start gap-2">
       <AnimatePresence>
         {transcript && (
           <motion.div
@@ -232,7 +232,7 @@ export const VoiceCommand = () => {
               <div className="font-display text-sm font-semibold">Voice commands</div>
               <button
                 onClick={() => setShowHelp(false)}
-                className="text-muted-foreground hover:text-foreground"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
                 aria-label="Close help"
               >
                 <X className="h-4 w-4" />
@@ -275,7 +275,7 @@ export const VoiceCommand = () => {
         </motion.button>
         <button
           onClick={() => setShowHelp((s) => !s)}
-          className="h-9 w-9 rounded-full glass flex items-center justify-center text-muted-foreground hover:text-foreground"
+          className="h-10 w-10 rounded-full glass flex items-center justify-center text-muted-foreground hover:text-foreground"
           aria-label="Voice command help"
         >
           <HelpCircle className="h-4 w-4" />

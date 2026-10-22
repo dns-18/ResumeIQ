@@ -51,7 +51,7 @@ export const CopilotPanel = () => {
       <motion.button
         whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-gradient-aurora animate-aurora shadow-neon flex items-center justify-center text-background"
+        className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-[max(1.5rem,env(safe-area-inset-right))] z-40 h-14 w-14 rounded-full bg-gradient-aurora animate-aurora shadow-neon flex items-center justify-center text-background"
         aria-label="Open AI Copilot"
       >
         <MessageSquare className="h-6 w-6" />
@@ -102,7 +102,7 @@ export const CopilotPanel = () => {
                   <button
                     key={s}
                     onClick={() => send(s)}
-                    className="text-[11px] px-2.5 py-1 rounded-full bg-secondary hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                    className="text-[11px] px-2.5 py-1 min-h-9 rounded-full bg-secondary hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
                   >
                     <Sparkles className="h-3 w-3" /> {s}
                   </button>

@@ -16,6 +16,7 @@ import { CopilotPanel } from "@/components/CopilotPanel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const radarData = [
   { axis: "Keywords", v: 88 },
@@ -56,26 +57,27 @@ const achievements = [
 ];
 
 export default function Dashboard() {
+  usePageTitle("Dashboard · ResumeIQ");
   const [analyzed, setAnalyzed] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Workspace</div>
             <h1 className="font-display text-3xl md:text-4xl font-bold">AI Analysis Dashboard</h1>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="glass border-border"><Download className="h-4 w-4 mr-2" />Export PDF</Button>
-            <Button className="bg-gradient-aurora animate-aurora text-background"><Sparkles className="h-4 w-4 mr-2" />New analysis</Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" className="glass flex-1 border-border sm:flex-none"><Download className="h-4 w-4 mr-2" />Export PDF</Button>
+            <Button className="bg-gradient-aurora animate-aurora flex-1 text-background sm:flex-none"><Sparkles className="h-4 w-4 mr-2" />New analysis</Button>
           </div>
         </motion.div>
 
         {!analyzed ? (
-          <GlassCard glow className="p-8">
+          <GlassCard glow className="p-4 sm:p-8">
             <UploadZone onComplete={() => setAnalyzed(true)} />
           </GlassCard>
         ) : (

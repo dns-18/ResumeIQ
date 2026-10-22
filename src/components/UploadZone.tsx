@@ -32,7 +32,7 @@ export const UploadZone = ({ onComplete }: { onComplete?: () => void }) => {
         e.preventDefault(); setDrag(false);
         const f = e.dataTransfer.files?.[0]; if (f) start(f.name);
       }}
-      className={`relative rounded-2xl border-2 border-dashed transition-all p-10 text-center ${
+      className={`relative rounded-2xl border-2 border-dashed transition-all p-6 sm:p-10 text-center ${
         drag ? "border-neon-violet bg-secondary/40" : "border-border"
       }`}
     >

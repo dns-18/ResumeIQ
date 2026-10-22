@@ -4,6 +4,7 @@ import { TrendingUp, Trophy, Users, Sparkles, ArrowUpRight, Target } from "lucid
 import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { Badge } from "@/components/ui/badge";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const dist = [
   { range: "0-50", count: 8, you: false },
@@ -23,10 +24,12 @@ const metrics = [
 ];
 
 export default function Benchmark() {
+  usePageTitle("Benchmark · ResumeIQ");
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Anonymized benchmark</div>
           <h1 className="font-display text-3xl md:text-4xl font-bold">Where you stand vs the top 10%</h1>
@@ -78,9 +81,9 @@ export default function Benchmark() {
               const max = Math.max(m.top10, m.you, m.avg);
               return (
                 <motion.div key={m.label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
-                  <div className="flex justify-between text-sm mb-1.5">
-                    <span>{m.label}</span>
-                    <span className="text-muted-foreground font-mono">You {m.you} · Top 10% {m.top10} · Avg {m.avg}</span>
+                  <div className="flex flex-wrap justify-between gap-x-4 gap-y-1 text-sm mb-1.5">
+                    <span className="min-w-0">{m.label}</span>
+                    <span className="text-muted-foreground font-mono text-right break-words">You {m.you} · Top 10% {m.top10} · Avg {m.avg}</span>
                   </div>
                   <div className="relative h-3 rounded-full bg-secondary overflow-hidden">
                     <div className="absolute inset-y-0 left-0 bg-muted-foreground/30" style={{ width: `${(m.avg / max) * 100}%` }} />

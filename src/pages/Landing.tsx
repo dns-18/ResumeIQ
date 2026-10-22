@@ -1,9 +1,14 @@
 import { FormEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   ArrowRight,
   Brain,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Clipboard,
   Copy,
   FileText,
@@ -11,6 +16,7 @@ import {
   Instagram,
   Link2,
   Mail,
+  Menu,
   Mic,
   Shield,
   Sparkles,
@@ -304,6 +310,7 @@ const useLoopingVideoFade = () => {
 };
 
 export default function Landing() {
+  usePageTitle("ResumeIQ — AI Resume Analysis & Career Copilot");
   const videoRef = useLoopingVideoFade();
   const [jobUrl, setJobUrl] = useState("");
   const [applicantName, setApplicantName] = useState("");
@@ -317,6 +324,7 @@ export default function Landing() {
   const [linkedInUrl, setLinkedInUrl] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
   const [ghostEmail, setGhostEmail] = useState("");
+  const [emailExpanded, setEmailExpanded] = useState(false);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -342,6 +350,7 @@ export default function Landing() {
     const existingDrafts = JSON.parse(localStorage.getItem("resumeiq-ghost-emails") || "[]") as string[];
     localStorage.setItem("resumeiq-ghost-emails", JSON.stringify([emailDraft, ...existingDrafts].slice(0, 5)));
     setGhostEmail(emailDraft);
+    setEmailExpanded(false);
     setEmailStatus(
       extractLinkedInJobId(trimmedUrl)
         ? "Email created for this LinkedIn job. Add the company/recruiter name or pasted JD text for even sharper targeting."
@@ -351,7 +360,7 @@ export default function Landing() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-black text-white">
-      <section id="top" className="relative min-h-screen overflow-hidden">
+      <section id="top" className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,hsl(220,24%,9%)_0%,hsl(220,18%,5%)_55%,#000000_100%)]">
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full translate-y-[17%] object-cover"
@@ -390,6 +399,45 @@ export default function Landing() {
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-10 w-10 text-white hover:bg-white/10 hover:text-white md:hidden" aria-label="Open menu">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="flex w-[min(320px,85vw)] flex-col border-white/10 p-0">
+                  <SheetTitle className="sr-only">Menu</SheetTitle>
+                  <div className="flex items-center gap-2 p-4 text-lg font-semibold text-foreground">
+                    <Globe size={24} />
+                    <span>ResumeIQ</span>
+                  </div>
+                  <nav className="flex flex-col gap-1 px-3">
+                    {[
+                      { label: "Features", to: "#features" },
+                      { label: "Pricing", to: "#pricing" },
+                      { label: "About", to: "#about" },
+                      { label: "Sign Up", to: "#signup" },
+                    ].map((item) => (
+                      <SheetClose asChild key={item.label}>
+                        <a
+                          href={item.to}
+                          className="flex min-h-11 items-center rounded-xl px-3 text-base font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                        >
+                          {item.label}
+                        </a>
+                      </SheetClose>
+                    ))}
+                    <SheetClose asChild>
+                      <Link
+                        to="/dashboard"
+                        className="flex min-h-11 items-center rounded-xl px-3 text-base font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                      >
+                        Login
+                      </Link>
+                    </SheetClose>
+                  </nav>
+                </SheetContent>
+              </Sheet>
               <a className="hidden text-sm font-medium text-white sm:inline" href="#signup">
                 Sign Up
               </a>
@@ -426,7 +474,7 @@ export default function Landing() {
               </div>
               <div className="grid gap-3 md:grid-cols-3">
                 <input
-                  className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                   placeholder="Your name"
                   type="text"
                   aria-label="Your name"
@@ -434,7 +482,7 @@ export default function Landing() {
                   onChange={(event) => setApplicantName(event.target.value)}
                 />
                 <input
-                  className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                   placeholder="College + CGPA"
                   type="text"
                   aria-label="College and CGPA"
@@ -442,8 +490,8 @@ export default function Landing() {
                   onChange={(event) => setEducation(event.target.value)}
                 />
                 <input
-                  className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
-                  placeholder="Recruiter, company, or email"
+                  className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
+                  placeholder="Recruiter name or email"
                   type="text"
                   aria-label="Company or recruiter name"
                   value={targetName}
@@ -452,14 +500,14 @@ export default function Landing() {
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 <textarea
-                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                   placeholder="Write your skills manually, e.g. React, JavaScript, C++, frontend"
                   aria-label="LinkedIn profile summary and skills"
                   value={profileContext}
                   onChange={(event) => setProfileContext(event.target.value)}
                 />
                 <textarea
-                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                   placeholder="Proof highlights, one per line"
                   aria-label="Proof highlights"
                   value={proofHighlights}
@@ -474,7 +522,7 @@ export default function Landing() {
                   { label: "LinkedIn profile link", value: linkedInUrl, onChange: setLinkedInUrl },
                 ].map((field) => (
                   <input
-                    className="liquid-glass rounded-full px-5 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                    className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
                     placeholder={field.label}
                     type="text"
                     aria-label={field.label}
@@ -490,7 +538,7 @@ export default function Landing() {
               Write your own details manually and get a short recruiter-ready cold email with proof, links, and one clear ask.
             </p>
             {ghostEmail && (
-              <div className="liquid-glass max-h-56 overflow-auto rounded-[24px] p-5 text-left text-sm leading-6 text-white/85">
+              <div className="liquid-glass rounded-[24px] p-5 text-left text-sm leading-6 text-white/85">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <span className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-white/45">
                     <Clipboard className="h-4 w-4" />
@@ -515,7 +563,25 @@ export default function Landing() {
                     <Mail className="h-4 w-4" />
                   </a>
                 </div>
-                <pre className="whitespace-pre-wrap font-sans">{ghostEmail}</pre>
+                <div className={emailExpanded ? undefined : "max-h-40 overflow-auto"}>
+                  <pre className="whitespace-pre-wrap font-sans">{ghostEmail}</pre>
+                </div>
+                <button
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/15"
+                  onClick={() => setEmailExpanded((value) => !value)}
+                  type="button"
+                  aria-expanded={emailExpanded}
+                >
+                  {emailExpanded ? (
+                    <>
+                      Show less <ChevronUp className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      Show full email <ChevronDown className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
               </div>
             )}
             <Link
@@ -527,7 +593,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <footer className="relative z-10 flex justify-center gap-4 pb-12">
+        <footer className="relative z-10 flex justify-center gap-4 pb-24 md:pb-12">
           {[
             { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/" },
             { icon: Twitter, label: "Twitter", href: "https://x.com/" },
