@@ -2,7 +2,13 @@ import { FormEvent, MutableRefObject, useEffect, useRef, useState } from "react"
 import { Link } from "react-router-dom";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   ArrowRight,
   Brain,
@@ -114,17 +120,23 @@ type GhostEmailInput = {
   targetName: string;
 };
 
-const titleCase = (value: string) => value.replace(/\b\w/g, (letter) => letter.toUpperCase());
+const titleCase = (value: string) =>
+  value.replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 const isUrl = (value: string) => /^https?:\/\/.+\..+/.test(value);
 
-const extractLinkedInJobId = (value: string) => value.match(/linkedin\.com\/jobs\/view\/(\d+)/i)?.[1];
+const extractLinkedInJobId = (value: string) =>
+  value.match(/linkedin\.com\/jobs\/view\/(\d+)/i)?.[1];
 
-const extractEmailAddress = (value: string) => value.match(/[^\s<>]+@[^\s<>]+\.[^\s<>]+/)?.[0] || "";
+const extractEmailAddress = (value: string) =>
+  value.match(/[^\s<>]+@[^\s<>]+\.[^\s<>]+/)?.[0] || "";
 
 const inferCompanyFromUrl = (url: string, targetName: string) => {
   if (targetName.trim()) return targetName.trim();
-  if (/linkedin\.com\/jobs\/view/i.test(url)) return "the hiring team";
+
+  if (/linkedin\.com\/jobs\/view/i.test(url)) {
+    return "the hiring team";
+  }
 
   try {
     const host = new URL(url).hostname.replace(/^www\./, "");
@@ -133,6 +145,7 @@ const inferCompanyFromUrl = (url: string, targetName: string) => {
       ?.replace(/[-_]/g, " ")
       .replace(/\b(jobs|careers|apply|workday|greenhouse|lever)\b/gi, "")
       .trim();
+
     return cleaned ? titleCase(cleaned) : "the hiring team";
   } catch {
     return "the hiring team";
@@ -141,33 +154,66 @@ const inferCompanyFromUrl = (url: string, targetName: string) => {
 
 const inferRoleLabel = (jobSource: string) => {
   const linkedInJobId = extractLinkedInJobId(jobSource);
-  if (linkedInJobId) return `LinkedIn job #${linkedInJobId}`;
+
+  if (linkedInJobId) {
+    return `LinkedIn job #${linkedInJobId}`;
+  }
+
   if (isUrl(jobSource)) return "the open role";
 
-  const roleMatch = jobSource.match(/(?:role|title|position)\s*[:\-]\s*([^\n.,]+)/i);
+  const roleMatch = jobSource.match(
+    /(?:role|title|position)\s*[:\-]\s*([^\n.,]+)/i,
+  );
+
   return roleMatch?.[1]?.trim() || "the open role";
 };
 
 const extractKeywords = (jobSource: string, profileContext: string) => {
   const normalized = `${jobSource} ${profileContext}`.toLowerCase();
+
   const profileTerms = profileContext
     .split(/[,;\n]/)
     .map((term) => term.trim())
     .filter((term) => term.length > 2)
     .slice(0, 6);
 
-  const atsTerms = keywordBank.filter((keyword) => normalized.includes(keyword));
-  const fallbackTerms = ["strategy", "data", "product", "growth", "stakeholder", "delivery"];
+  const atsTerms = keywordBank.filter((keyword) =>
+    normalized.includes(keyword),
+  );
 
-  return Array.from(new Set([...profileTerms, ...atsTerms, ...fallbackTerms])).slice(0, 9);
+  const fallbackTerms = [
+    "strategy",
+    "data",
+    "product",
+    "growth",
+    "stakeholder",
+    "delivery",
+  ];
+
+  return Array.from(
+    new Set([...profileTerms, ...atsTerms, ...fallbackTerms]),
+  ).slice(0, 9);
 };
 
 const pickSpecificArea = (jobSource: string, keywords: string[]) => {
   const source = jobSource.toLowerCase();
-  if (source.includes("frontend") || source.includes("react")) return "frontend products";
-  if (source.includes("backend") || source.includes("api")) return "backend systems";
-  if (source.includes("data") || source.includes("analytics")) return "data-driven products";
-  if (source.includes("ai") || source.includes("machine learning")) return "AI tools";
+
+  if (source.includes("frontend") || source.includes("react")) {
+    return "frontend products";
+  }
+
+  if (source.includes("backend") || source.includes("api")) {
+    return "backend systems";
+  }
+
+  if (source.includes("data") || source.includes("analytics")) {
+    return "data-driven products";
+  }
+
+  if (source.includes("ai") || source.includes("machine learning")) {
+    return "AI tools";
+  }
+
   return keywords[0] ? `${keywords[0]} work` : "software engineering";
 };
 
@@ -182,7 +228,10 @@ const buildMailtoHref = (emailDraft: string, targetName: string) => {
   const [subjectLine, ...bodyLines] = emailDraft.split("\n");
   const subject = subjectLine.replace(/^Subject:\s*/i, "").trim();
   const recipient = extractEmailAddress(targetName);
-  return `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join("\n").trim())}`;
+
+  return `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
+    bodyLines.join("\n").trim(),
+  )}`;
 };
 
 const buildGhostEmail = ({
@@ -197,17 +246,33 @@ const buildGhostEmail = ({
   proofHighlights,
   targetName,
 }: GhostEmailInput) => {
-  const company = isUrl(jobSource) ? inferCompanyFromUrl(jobSource, targetName) : targetName.trim() || "the hiring team";
+  const company = isUrl(jobSource)
+    ? inferCompanyFromUrl(jobSource, targetName)
+    : targetName.trim() || "the hiring team";
+
   const roleLabel = inferRoleLabel(jobSource);
   const keywords = extractKeywords(jobSource, profileContext);
   const topKeywords = keywords.slice(0, 3);
   const name = applicantName.trim() || "Your Name";
   const educationLine = education.trim() || "a Computer Science student";
-  const profileLine = profileContext.trim() || "React, JavaScript, C++, and software engineering";
+  const profileLine =
+    profileContext.trim() ||
+    "React, JavaScript, C++, and software engineering";
+
   const highlights = splitProofHighlights(proofHighlights);
-  const proofLines = (highlights.length ? highlights : ["Built practical projects", "Solved DSA problems", "Strong interest in software engineering"])
+
+  const proofLines = (
+    highlights.length
+      ? highlights
+      : [
+          "Built practical projects",
+          "Solved DSA problems",
+          "Strong interest in software engineering",
+        ]
+  )
     .map((highlight) => `- ${highlight}`)
     .join("\n");
+
   const specificArea = pickSpecificArea(jobSource, keywords);
 
   return `Subject: ${name} - ${roleLabel}
@@ -245,7 +310,10 @@ const fadeVideo = (
 
   const animate = (now: number) => {
     const progress = Math.min((now - startedAt) / duration, 1);
-    video.style.opacity = String(startOpacity + (targetOpacity - startOpacity) * progress);
+
+    video.style.opacity = String(
+      startOpacity + (targetOpacity - startOpacity) * progress,
+    );
 
     if (progress < 1) {
       animationRef.current = requestAnimationFrame(animate);
@@ -285,6 +353,7 @@ const useLoopingVideoFade = () => {
 
     const restartAfterFade = () => {
       video.style.opacity = "0";
+
       window.setTimeout(() => {
         video.currentTime = 0;
         void video.play();
@@ -300,6 +369,7 @@ const useLoopingVideoFade = () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
+
       video.removeEventListener("loadeddata", fadeIn);
       video.removeEventListener("timeupdate", fadeOutBeforeLoop);
       video.removeEventListener("ended", restartAfterFade);
@@ -311,7 +381,9 @@ const useLoopingVideoFade = () => {
 
 export default function Landing() {
   usePageTitle("ResumeIQ — AI Resume Analysis & Career Copilot");
+
   const videoRef = useLoopingVideoFade();
+
   const [jobUrl, setJobUrl] = useState("");
   const [applicantName, setApplicantName] = useState("");
   const [education, setEducation] = useState("");
@@ -328,10 +400,13 @@ export default function Landing() {
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     const trimmedUrl = jobUrl.trim();
 
     if (!trimmedUrl) {
-      setEmailStatus("Paste a LinkedIn job URL, job description, or recruiter post first.");
+      setEmailStatus(
+        "Paste a LinkedIn job URL, job description, or recruiter post first.",
+      );
       return;
     }
 
@@ -347,10 +422,24 @@ export default function Landing() {
       proofHighlights: proofHighlights.trim(),
       targetName: targetName.trim(),
     });
-    const existingDrafts = JSON.parse(localStorage.getItem("resumeiq-ghost-emails") || "[]") as string[];
-    localStorage.setItem("resumeiq-ghost-emails", JSON.stringify([emailDraft, ...existingDrafts].slice(0, 5)));
+
+    try {
+      const savedDrafts = localStorage.getItem("resumeiq-ghost-emails");
+      const existingDrafts = savedDrafts
+        ? (JSON.parse(savedDrafts) as string[])
+        : [];
+
+      localStorage.setItem(
+        "resumeiq-ghost-emails",
+        JSON.stringify([emailDraft, ...existingDrafts].slice(0, 5)),
+      );
+    } catch {
+      // Email generation still works if local storage is unavailable.
+    }
+
     setGhostEmail(emailDraft);
     setEmailExpanded(false);
+
     setEmailStatus(
       extractLinkedInJobId(trimmedUrl)
         ? "Email created for this LinkedIn job. Add the company/recruiter name or pasted JD text for even sharper targeting."
@@ -358,9 +447,23 @@ export default function Landing() {
     );
   };
 
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(ghostEmail);
+      setEmailStatus("Copied the ATS-tuned cold email.");
+    } catch {
+      setEmailStatus(
+        "Copy was unavailable in this browser. Select the email text and copy it manually.",
+      );
+    }
+  };
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-black text-white">
-      <section id="top" className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,hsl(220,24%,9%)_0%,hsl(220,18%,5%)_55%,#000000_100%)]">
+      <section
+        id="top"
+        className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,hsl(220,24%,9%)_0%,hsl(220,18%,5%)_55%,#000000_100%)]"
+      >
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full translate-y-[17%] object-cover"
@@ -370,262 +473,359 @@ export default function Landing() {
           playsInline
           preload="auto"
         />
+
         <div className="absolute inset-0 bg-black/45" />
         <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-black/85 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/85 to-transparent" />
 
         <div className="relative flex min-h-screen flex-col">
-        <nav className="relative z-20 px-6 py-6">
-          <div className="liquid-glass mx-auto flex max-w-5xl items-center justify-between rounded-full px-6 py-3">
-            <div className="flex items-center gap-8">
-              <Link to="/" className="flex items-center gap-2 text-lg font-semibold text-white" aria-label="ResumeIQ home">
-                <Globe size={24} />
-                <span>ResumeIQ</span>
-              </Link>
-              <div className="hidden items-center gap-8 md:flex">
-                {[
-                  { label: "Features", to: "#features" },
-                  { label: "Pricing", to: "#pricing" },
-                  { label: "About", to: "#about" },
-                ].map((item) => (
-                  <a
-                    className="text-sm font-medium text-white/80 transition-colors hover:text-white"
-                    href={item.to}
-                    key={item.label}
-                  >
-                    {item.label}
-                  </a>
-                ))}
+          <nav className="relative z-20 px-6 py-6">
+            <div className="liquid-glass mx-auto flex max-w-5xl items-center justify-between rounded-full px-6 py-3">
+              <div className="flex items-center gap-8">
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-lg font-semibold text-white"
+                  aria-label="ResumeIQ home"
+                >
+                  <Globe size={24} />
+                  <span>ResumeIQ</span>
+                </Link>
+
+                <div className="hidden items-center gap-8 md:flex">
+                  {[
+                    { label: "Features", to: "#features" },
+                    { label: "Pricing", to: "#pricing" },
+                    { label: "About", to: "#about" },
+                  ].map((item) => (
+                    <a
+                      className="text-sm font-medium text-white/80 transition-colors hover:text-white"
+                      href={item.to}
+                      key={item.label}
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 text-white hover:bg-white/10 hover:text-white md:hidden" aria-label="Open menu">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="flex w-[min(320px,85vw)] flex-col border-white/10 p-0">
-                  <SheetTitle className="sr-only">Menu</SheetTitle>
-                  <div className="flex items-center gap-2 p-4 text-lg font-semibold text-foreground">
-                    <Globe size={24} />
-                    <span>ResumeIQ</span>
-                  </div>
-                  <nav className="flex flex-col gap-1 px-3">
-                    {[
-                      { label: "Features", to: "#features" },
-                      { label: "Pricing", to: "#pricing" },
-                      { label: "About", to: "#about" },
-                      { label: "Sign Up", to: "#signup" },
-                    ].map((item) => (
-                      <SheetClose asChild key={item.label}>
-                        <a
-                          href={item.to}
+
+              <div className="flex items-center gap-2 sm:gap-4">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 text-white hover:bg-white/10 hover:text-white md:hidden"
+                      aria-label="Open menu"
+                    >
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+
+                  <SheetContent
+                    side="right"
+                    className="flex w-[min(320px,85vw)] flex-col border-white/10 p-0"
+                  >
+                    <SheetTitle className="sr-only">Menu</SheetTitle>
+
+                    <div className="flex items-center gap-2 p-4 text-lg font-semibold text-foreground">
+                      <Globe size={24} />
+                      <span>ResumeIQ</span>
+                    </div>
+
+                    <nav className="flex flex-col gap-1 px-3">
+                      {[
+                        { label: "Features", to: "#features" },
+                        { label: "Pricing", to: "#pricing" },
+                        { label: "About", to: "#about" },
+                        { label: "Sign Up", to: "#signup" },
+                      ].map((item) => (
+                        <SheetClose asChild key={item.label}>
+                          <a
+                            href={item.to}
+                            className="flex min-h-11 items-center rounded-xl px-3 text-base font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                          >
+                            {item.label}
+                          </a>
+                        </SheetClose>
+                      ))}
+
+                      <SheetClose asChild>
+                        <Link
+                          to="/dashboard"
                           className="flex min-h-11 items-center rounded-xl px-3 text-base font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground"
                         >
-                          {item.label}
-                        </a>
+                          Login
+                        </Link>
                       </SheetClose>
-                    ))}
-                    <SheetClose asChild>
-                      <Link
-                        to="/dashboard"
-                        className="flex min-h-11 items-center rounded-xl px-3 text-base font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground"
-                      >
-                        Login
-                      </Link>
-                    </SheetClose>
-                  </nav>
-                </SheetContent>
-              </Sheet>
-              <a className="hidden text-sm font-medium text-white sm:inline" href="#signup">
-                Sign Up
-              </a>
-              <Link className="liquid-glass rounded-full px-4 py-2 text-sm font-medium text-white sm:px-6" to="/dashboard">
-                Login
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+
+                <a
+                  className="hidden text-sm font-medium text-white sm:inline"
+                  href="#signup"
+                >
+                  Sign Up
+                </a>
+
+                <Link
+                  className="liquid-glass rounded-full px-4 py-2 text-sm font-medium text-white sm:px-6"
+                  to="/dashboard"
+                >
+                  Login
+                </Link>
+              </div>
+            </div>
+          </nav>
+
+          <section className="relative z-10 flex flex-1 flex-col items-center justify-start px-6 pb-12 pt-16 text-center md:pt-24 lg:pt-28">
+            <h1
+              className="mb-6 text-5xl tracking-tight text-white md:text-6xl lg:text-7xl"
+              style={{ fontFamily: "'Instrument Serif', serif" }}
+            >
+              ATS Ghost Writer Email
+            </h1>
+
+            <div className="w-full max-w-2xl space-y-4">
+              <form className="space-y-3" onSubmit={onSubmit}>
+                <div className="liquid-glass flex items-center gap-3 rounded-full py-2 pl-6 pr-2">
+                  <Link2 className="hidden h-5 w-5 text-white/55 sm:block" />
+
+                  <input
+                    className="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/40"
+                    placeholder="Paste LinkedIn job URL or JD text"
+                    type="text"
+                    aria-label="LinkedIn job URL or job description"
+                    value={jobUrl}
+                    onChange={(event) => setJobUrl(event.target.value)}
+                  />
+
+                  <button
+                    className="rounded-full bg-white p-3 text-black"
+                    type="submit"
+                    aria-label="Create email"
+                  >
+                    <ArrowRight size={20} />
+                  </button>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-3">
+                  <input
+                    className="liquid-glass rounded-full px-5 py-3 text-base text-white outline-none placeholder:text-white/40 md:text-sm"
+                    placeholder="Your name"
+                    type="text"
+                    aria-label="Your name"
+                    value={applicantName}
+                    onChange={(event) => setApplicantName(event.target.value)}
+                  />
+
+                  <input
+                    className="liquid-glass rounded-full px-5 py-3 text-base text-white outline-none placeholder:text-white/40 md:text-sm"
+                    placeholder="College + CGPA"
+                    type="text"
+                    aria-label="College and CGPA"
+                    value={education}
+                    onChange={(event) => setEducation(event.target.value)}
+                  />
+
+                  <input
+                    className="liquid-glass rounded-full px-5 py-3 text-base text-white outline-none placeholder:text-white/40 md:text-sm"
+                    placeholder="Recruiter name or email"
+                    type="text"
+                    aria-label="Company or recruiter name"
+                    value={targetName}
+                    onChange={(event) => setTargetName(event.target.value)}
+                  />
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2">
+                  <textarea
+                    className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-base text-white outline-none placeholder:text-white/40 md:text-sm"
+                    placeholder="Write your skills manually, e.g. React, JavaScript, C++, frontend"
+                    aria-label="LinkedIn profile summary and skills"
+                    value={profileContext}
+                    onChange={(event) =>
+                      setProfileContext(event.target.value)
+                    }
+                  />
+
+                  <textarea
+                    className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-base text-white outline-none placeholder:text-white/40 md:text-sm"
+                    placeholder="Proof highlights, one per line"
+                    aria-label="Proof highlights"
+                    value={proofHighlights}
+                    onChange={(event) =>
+                      setProofHighlights(event.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2">
+                  {[
+                    {
+                      label: "Portfolio link",
+                      value: portfolioUrl,
+                      onChange: setPortfolioUrl,
+                    },
+                    {
+                      label: "GitHub link",
+                      value: githubUrl,
+                      onChange: setGithubUrl,
+                    },
+                    {
+                      label: "Phone number",
+                      value: phone,
+                      onChange: setPhone,
+                    },
+                    {
+                      label: "LinkedIn profile link",
+                      value: linkedInUrl,
+                      onChange: setLinkedInUrl,
+                    },
+                  ].map((field) => (
+                    <input
+                      className="liquid-glass rounded-full px-5 py-3 text-base text-white outline-none placeholder:text-white/40 md:text-sm"
+                      placeholder={field.label}
+                      type="text"
+                      aria-label={field.label}
+                      value={field.value}
+                      onChange={(event) =>
+                        field.onChange(event.target.value)
+                      }
+                      key={field.label}
+                    />
+                  ))}
+                </div>
+              </form>
+
+              {emailStatus && (
+                <p className="px-4 text-sm font-medium text-white">
+                  {emailStatus}
+                </p>
+              )}
+
+              <p className="px-4 text-sm leading-relaxed text-white">
+                Write your own details manually and get a short recruiter-ready
+                cold email with proof, links, and one clear ask.
+              </p>
+
+              {ghostEmail && (
+                <div className="liquid-glass rounded-[24px] p-5 text-left text-sm leading-6 text-white/85">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-white/45">
+                      <Clipboard className="h-4 w-4" />
+                      Ready to send
+                    </span>
+
+                    <button
+                      className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/15"
+                      onClick={() => void handleCopyEmail()}
+                      type="button"
+                      aria-label="Copy cold email"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </button>
+
+                    <a
+                      className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/15"
+                      href={buildMailtoHref(ghostEmail, targetName)}
+                      aria-label="Open in email"
+                    >
+                      <Mail className="h-4 w-4" />
+                    </a>
+                  </div>
+
+                  <div
+                    className={
+                      emailExpanded ? undefined : "max-h-40 overflow-auto"
+                    }
+                  >
+                    <pre className="whitespace-pre-wrap font-sans">
+                      {ghostEmail}
+                    </pre>
+                  </div>
+
+                  <button
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/15"
+                    onClick={() =>
+                      setEmailExpanded((value) => !value)
+                    }
+                    type="button"
+                    aria-expanded={emailExpanded}
+                  >
+                    {emailExpanded ? (
+                      <>
+                        Show less <ChevronUp className="h-4 w-4" />
+                      </>
+                    ) : (
+                      <>
+                        Show full email <ChevronDown className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              <Link
+                className="liquid-glass inline-flex rounded-full px-8 py-3 text-sm font-medium text-white transition-colors hover:bg-white/5"
+                to="/voice-builder"
+              >
+                Build with voice
               </Link>
             </div>
-          </div>
-        </nav>
+          </section>
 
-        <section className="relative z-10 flex flex-1 flex-col items-center justify-start px-6 pb-12 pt-16 text-center md:pt-24 lg:pt-28">
-          <h1
-            className="mb-6 text-5xl tracking-tight text-white md:text-6xl lg:text-7xl"
-            style={{ fontFamily: "'Instrument Serif', serif" }}
-          >
-            ATS Ghost Writer Email
-          </h1>
-
-          <div className="w-full max-w-2xl space-y-4">
-            <form className="space-y-3" onSubmit={onSubmit}>
-              <div className="liquid-glass flex items-center gap-3 rounded-full py-2 pl-6 pr-2">
-                <Link2 className="hidden h-5 w-5 text-white/55 sm:block" />
-                <input
-                  className="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/40"
-                  placeholder="Paste LinkedIn job URL or JD text"
-                  type="text"
-                  aria-label="LinkedIn job URL or job description"
-                  value={jobUrl}
-                  onChange={(event) => setJobUrl(event.target.value)}
-                />
-                <button className="rounded-full bg-white p-3 text-black" type="submit" aria-label="Create email">
-                  <ArrowRight size={20} />
-                </button>
-              </div>
-              <div className="grid gap-3 md:grid-cols-3">
-                <input
-                  className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
-                  placeholder="Your name"
-                  type="text"
-                  aria-label="Your name"
-                  value={applicantName}
-                  onChange={(event) => setApplicantName(event.target.value)}
-                />
-                <input
-                  className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
-                  placeholder="College + CGPA"
-                  type="text"
-                  aria-label="College and CGPA"
-                  value={education}
-                  onChange={(event) => setEducation(event.target.value)}
-                />
-                <input
-                  className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
-                  placeholder="Recruiter name or email"
-                  type="text"
-                  aria-label="Company or recruiter name"
-                  value={targetName}
-                  onChange={(event) => setTargetName(event.target.value)}
-                />
-              </div>
-              <div className="grid gap-3 md:grid-cols-2">
-                <textarea
-                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
-                  placeholder="Write your skills manually, e.g. React, JavaScript, C++, frontend"
-                  aria-label="LinkedIn profile summary and skills"
-                  value={profileContext}
-                  onChange={(event) => setProfileContext(event.target.value)}
-                />
-                <textarea
-                  className="liquid-glass min-h-16 resize-none rounded-[24px] px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
-                  placeholder="Proof highlights, one per line"
-                  aria-label="Proof highlights"
-                  value={proofHighlights}
-                  onChange={(event) => setProofHighlights(event.target.value)}
-                />
-              </div>
-              <div className="grid gap-3 md:grid-cols-2">
-                {[
-                  { label: "Portfolio link", value: portfolioUrl, onChange: setPortfolioUrl },
-                  { label: "GitHub link", value: githubUrl, onChange: setGithubUrl },
-                  { label: "Phone number", value: phone, onChange: setPhone },
-                  { label: "LinkedIn profile link", value: linkedInUrl, onChange: setLinkedInUrl },
-                ].map((field) => (
-                  <input
-                    className="liquid-glass rounded-full px-5 py-3 text-base md:text-sm text-white outline-none placeholder:text-white/40"
-                    placeholder={field.label}
-                    type="text"
-                    aria-label={field.label}
-                    value={field.value}
-                    onChange={(event) => field.onChange(event.target.value)}
-                    key={field.label}
-                  />
-                ))}
-              </div>
-            </form>
-            {emailStatus && <p className="px-4 text-sm font-medium text-white">{emailStatus}</p>}
-            <p className="px-4 text-sm leading-relaxed text-white">
-              Write your own details manually and get a short recruiter-ready cold email with proof, links, and one clear ask.
-            </p>
-            {ghostEmail && (
-              <div className="liquid-glass rounded-[24px] p-5 text-left text-sm leading-6 text-white/85">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <span className="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-white/45">
-                    <Clipboard className="h-4 w-4" />
-                    Ready to send
-                  </span>
-                  <button
-                    className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/15"
-                    onClick={() => {
-                      void navigator.clipboard.writeText(ghostEmail);
-                      setEmailStatus("Copied the ATS-tuned cold email.");
-                    }}
-                    type="button"
-                    aria-label="Copy cold email"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </button>
-                  <a
-                    className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/15"
-                    href={buildMailtoHref(ghostEmail, targetName)}
-                    aria-label="Open in email"
-                  >
-                    <Mail className="h-4 w-4" />
-                  </a>
-                </div>
-                <div className={emailExpanded ? undefined : "max-h-40 overflow-auto"}>
-                  <pre className="whitespace-pre-wrap font-sans">{ghostEmail}</pre>
-                </div>
-                <button
-                  className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/15"
-                  onClick={() => setEmailExpanded((value) => !value)}
-                  type="button"
-                  aria-expanded={emailExpanded}
-                >
-                  {emailExpanded ? (
-                    <>
-                      Show less <ChevronUp className="h-4 w-4" />
-                    </>
-                  ) : (
-                    <>
-                      Show full email <ChevronDown className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-            <Link
-              className="liquid-glass inline-flex rounded-full px-8 py-3 text-sm font-medium text-white transition-colors hover:bg-white/5"
-              to="/voice-builder"
-            >
-              Build with voice
-            </Link>
-          </div>
-        </section>
-
-        <footer className="relative z-10 flex justify-center gap-4 pb-24 md:pb-12">
-          {[
-            { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/" },
-            { icon: Twitter, label: "Twitter", href: "https://x.com/" },
-            { icon: Globe, label: "Website", href: "https://github.com/dns-18/ResumeIQ" },
-          ].map(({ href, icon: Icon, label }) => (
-            <a
-              aria-label={label}
-              className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white"
-              href={href}
-              key={label}
-              rel="noreferrer"
-              target="_blank"
-            >
-              <Icon size={20} />
-            </a>
-          ))}
-        </footer>
+          <footer className="relative z-10 flex justify-center gap-4 pb-24 md:pb-12">
+            {[
+              {
+                icon: Instagram,
+                label: "Instagram",
+                href: "https://www.instagram.com/",
+              },
+              { icon: Twitter, label: "Twitter", href: "https://x.com/" },
+              {
+                icon: Globe,
+                label: "Website",
+                href: "https://github.com/dns-18/ResumeIQ",
+              },
+            ].map(({ href, icon: Icon, label }) => (
+              <a
+                aria-label={label}
+                className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white"
+                href={href}
+                key={label}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <Icon size={20} />
+              </a>
+            ))}
+          </footer>
         </div>
       </section>
 
       <section id="features" className="relative bg-black px-6 py-24">
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 max-w-2xl">
-            <p className="text-xs uppercase tracking-[0.28em] text-white/45">Features</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">Everything your resume needs to speak clearly.</h2>
+            <p className="text-xs uppercase tracking-[0.28em] text-white/45">
+              Features
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+              Everything your resume needs to speak clearly.
+            </h2>
           </div>
+
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {features.map(({ icon: Icon, title, text }) => (
-              <article className="liquid-glass rounded-[28px] p-6" key={title}>
+              <article
+                className="liquid-glass rounded-[28px] p-6"
+                key={title}
+              >
                 <Icon className="mb-8 h-7 w-7 text-white" />
                 <h3 className="text-lg font-semibold">{title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-white/65">{text}</p>
+                <p className="mt-3 text-sm leading-relaxed text-white/65">
+                  {text}
+                </p>
               </article>
             ))}
           </div>
@@ -636,23 +836,42 @@ export default function Landing() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <p className="text-xs uppercase tracking-[0.28em] text-white/45">Pricing</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">Start free, upgrade when your search gets serious.</h2>
+              <p className="text-xs uppercase tracking-[0.28em] text-white/45">
+                Pricing
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+                Start free, upgrade when your search gets serious.
+              </h2>
             </div>
-            <a className="liquid-glass inline-flex rounded-full px-6 py-3 text-sm font-medium text-white" href="#signup">
+
+            <a
+              className="liquid-glass inline-flex rounded-full px-6 py-3 text-sm font-medium text-white"
+              href="#signup"
+            >
               Join early access
             </a>
           </div>
+
           <div className="grid gap-4 md:grid-cols-3">
             {pricing.map((plan) => (
-              <article className="liquid-glass rounded-[28px] p-6" key={plan.name}>
+              <article
+                className="liquid-glass rounded-[28px] p-6"
+                key={plan.name}
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-semibold">{plan.name}</h3>
                   <CheckCircle2 className="h-5 w-5 text-white/70" />
                 </div>
+
                 <p className="mt-6 text-4xl font-semibold">{plan.price}</p>
-                <p className="mt-4 text-sm leading-relaxed text-white/65">{plan.text}</p>
-                <Link className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-white" to="/voice-builder">
+                <p className="mt-4 text-sm leading-relaxed text-white/65">
+                  {plan.text}
+                </p>
+
+                <Link
+                  className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-white"
+                  to="/voice-builder"
+                >
                   Try this plan <ArrowRight size={16} />
                 </Link>
               </article>
@@ -664,21 +883,47 @@ export default function Landing() {
       <section id="about" className="relative bg-black px-6 py-24">
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_0.8fr] lg:items-center">
           <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-white/45">About</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">ResumeIQ helps people explain their work with confidence.</h2>
+            <p className="text-xs uppercase tracking-[0.28em] text-white/45">
+              About
+            </p>
+
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+              ResumeIQ helps people explain their work with confidence.
+            </h2>
+
             <p className="mt-6 max-w-2xl text-base leading-8 text-white/65">
-              The product combines voice capture, AI rewriting, ATS structure, and recruiter-style feedback so a resume feels less like a blank page and more like a guided conversation.
+              The product combines voice capture, AI rewriting, ATS structure,
+              and recruiter-style feedback so a resume feels less like a blank
+              page and more like a guided conversation.
             </p>
           </div>
+
           <div className="liquid-glass rounded-[28px] p-6">
             {[
-              { icon: Users, label: "Built for students, job seekers, and career switchers." },
-              { icon: Sparkles, label: "Designed to turn messy career details into sharp proof." },
-              { icon: Zap, label: "Focused on faster drafts, clearer keywords, and stronger applications." },
+              {
+                icon: Users,
+                label:
+                  "Built for students, job seekers, and career switchers.",
+              },
+              {
+                icon: Sparkles,
+                label:
+                  "Designed to turn messy career details into sharp proof.",
+              },
+              {
+                icon: Zap,
+                label:
+                  "Focused on faster drafts, clearer keywords, and stronger applications.",
+              },
             ].map(({ icon: Icon, label }) => (
-              <div className="flex gap-4 border-b border-white/10 py-5 last:border-b-0" key={label}>
+              <div
+                className="flex gap-4 border-b border-white/10 py-5 last:border-b-0"
+                key={label}
+              >
                 <Icon className="mt-1 h-5 w-5 shrink-0 text-white" />
-                <p className="text-sm leading-relaxed text-white/70">{label}</p>
+                <p className="text-sm leading-relaxed text-white/70">
+                  {label}
+                </p>
               </div>
             ))}
           </div>
@@ -687,16 +932,31 @@ export default function Landing() {
 
       <section id="signup" className="relative bg-zinc-950 px-6 py-20">
         <div className="liquid-glass mx-auto max-w-4xl rounded-[32px] p-8 text-center md:p-12">
-          <p className="text-xs uppercase tracking-[0.28em] text-white/45">Early access</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">Get ResumeIQ updates in your inbox.</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/65">
-            Use the email box in the hero to join the list, or jump into the voice builder and create your first draft now.
+          <p className="text-xs uppercase tracking-[0.28em] text-white/45">
+            Early access
           </p>
+
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+            Get ResumeIQ updates in your inbox.
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/65">
+            Use the email box in the hero to join the list, or jump into the
+            voice builder and create your first draft now.
+          </p>
+
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black" href="#top">
+            <a
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black"
+              href="#top"
+            >
               Back to email
             </a>
-            <Link className="liquid-glass rounded-full px-6 py-3 text-sm font-medium text-white" to="/voice-builder">
+
+            <Link
+              className="liquid-glass rounded-full px-6 py-3 text-sm font-medium text-white"
+              to="/voice-builder"
+            >
               Open voice builder
             </Link>
           </div>
