@@ -165,3 +165,5 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 <div align="center">
 Built to help job seekers land their dream roles. 🚀
 </div>
+
+<p align="center"><em>Oct 2026 — Mobile-first UI upgrade shipped: navigation, layout and landing fixes on every page.</em></p>
