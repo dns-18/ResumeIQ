@@ -4,6 +4,7 @@ import { Dna, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { CopilotPanel } from "@/components/CopilotPanel";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const traits = [
   { axis: "Strategic", v: 88 },
@@ -21,6 +22,8 @@ const archetypes = [
 ];
 
 export default function DnaPage() {
+  usePageTitle("Resume DNA · ResumeIQ");
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />

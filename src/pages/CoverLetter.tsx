@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const TONES = ["Professional", "Conversational", "Confident", "Storytelling"] as const;
 
@@ -27,6 +28,7 @@ Jane Doe
 — Tone: ${tone}`;
 
 export default function CoverLetter() {
+  usePageTitle("Cover Letter · ResumeIQ");
   const [jd, setJd] = useState("");
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");

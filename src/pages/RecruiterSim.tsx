@@ -6,6 +6,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { Button } from "@/components/ui/button";
 import { ScoreRing } from "@/components/ScoreRing";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const sections = [
   { id: "header", label: "Header", x: "10%", y: "8%", w: "80%", h: "14%", attention: 95, comment: "Eye anchors here first — strong name & title contrast." },
@@ -16,6 +17,7 @@ const sections = [
 ];
 
 export default function RecruiterSim() {
+  usePageTitle("Recruiter Sim · ResumeIQ");
   const [step, setStep] = useState(-1);
   const [running, setRunning] = useState(false);
 

@@ -6,6 +6,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 type SpeechRecognitionInstance = EventTarget & {
   continuous: boolean;
@@ -40,6 +41,7 @@ Leadership | Communication | Problem Solving | AI Tools | Resume Strategy | Care
 };
 
 export default function VoiceBuilder() {
+  usePageTitle("Voice Builder · ResumeIQ");
   const [listening, setListening] = useState(false);
   const [supported, setSupported] = useState(true);
   const [transcript, setTranscript] = useState("");

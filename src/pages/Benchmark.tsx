@@ -4,6 +4,7 @@ import { TrendingUp, Trophy, Users, Sparkles, ArrowUpRight, Target } from "lucid
 import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { Badge } from "@/components/ui/badge";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const dist = [
   { range: "0-50", count: 8, you: false },
@@ -23,6 +24,8 @@ const metrics = [
 ];
 
 export default function Benchmark() {
+  usePageTitle("Benchmark · ResumeIQ");
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />

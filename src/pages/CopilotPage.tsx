@@ -4,6 +4,7 @@ import { CopilotPanel } from "@/components/CopilotPanel";
 import { Wand2, Check, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const bullets = [
   { weak: "Helped manage marketing campaigns for products.", strong: "Led 6 cross-channel marketing campaigns generating $2.3M pipeline and 41% MQL lift in 2 quarters." },
@@ -12,6 +13,7 @@ const bullets = [
 ];
 
 export default function CopilotPage() {
+  usePageTitle("Copilot · ResumeIQ");
   const [applied, setApplied] = useState<number[]>([]);
 
   return (

@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 type Version = { id: string; name: string; role: string; score: number; applies: number; callbacks: number; updated: string; best?: boolean };
 
@@ -16,6 +17,7 @@ const initialVersions: Version[] = [
 ];
 
 export default function ResumeVersions() {
+  usePageTitle("Versions · ResumeIQ");
   const [versions, setVersions] = useState<Version[]>(initialVersions);
   const [selected, setSelected] = useState<string[]>(["v1", "v2"]);
 

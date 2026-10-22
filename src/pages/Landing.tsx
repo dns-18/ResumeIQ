@@ -1,5 +1,6 @@
 import { FormEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -309,6 +310,7 @@ const useLoopingVideoFade = () => {
 };
 
 export default function Landing() {
+  usePageTitle("ResumeIQ — AI Resume Analysis & Career Copilot");
   const videoRef = useLoopingVideoFade();
   const [jobUrl, setJobUrl] = useState("");
   const [applicantName, setApplicantName] = useState("");

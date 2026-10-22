@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const gaps = [
   { type: "missing", side: "linkedin", text: "Promotion to Senior PM (2024) is on LinkedIn but missing from resume", action: "Import to resume" },
@@ -15,6 +16,7 @@ const gaps = [
 ];
 
 export default function LinkedInSync() {
+  usePageTitle("LinkedIn Sync · ResumeIQ");
   const [connected, setConnected] = useState(false);
   const [syncing, setSyncing] = useState(false);
 

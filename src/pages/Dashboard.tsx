@@ -16,6 +16,7 @@ import { CopilotPanel } from "@/components/CopilotPanel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const radarData = [
   { axis: "Keywords", v: 88 },
@@ -56,6 +57,7 @@ const achievements = [
 ];
 
 export default function Dashboard() {
+  usePageTitle("Dashboard · ResumeIQ");
   const [analyzed, setAnalyzed] = useState(false);
 
   return (
