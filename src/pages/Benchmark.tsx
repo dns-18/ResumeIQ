@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from "recharts";
 import { TrendingUp, Trophy, Users, Sparkles, ArrowUpRight, Target } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { Badge } from "@/components/ui/badge";
 import { usePageTitle } from "@/hooks/usePageTitle";
@@ -28,7 +27,6 @@ export default function Benchmark() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Anonymized benchmark</div>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Sparkles, Copy, Download, RefreshCw, Wand2 } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,7 +43,6 @@ export default function CoverLetter() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Cover letter AI</div>

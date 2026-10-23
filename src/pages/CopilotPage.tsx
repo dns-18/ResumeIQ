@@ -1,4 +1,3 @@
-import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { Wand2, Check, Sparkles } from "lucide-react";
@@ -18,7 +17,6 @@ export default function CopilotPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-5xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <div>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Studio</div>

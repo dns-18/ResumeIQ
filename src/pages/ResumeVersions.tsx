@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Copy, Trash2, Star, Trophy, FileText, Target, TrendingUp } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +33,6 @@ export default function ResumeVersions() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-end justify-between gap-3">
           <div>

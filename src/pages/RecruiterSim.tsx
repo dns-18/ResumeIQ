@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, Play, RefreshCw, Sparkles } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,6 @@ export default function RecruiterSim() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>

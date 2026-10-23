@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Radar, RadarChart, PolarAngleAxis, PolarGrid, ResponsiveContainer } from "recharts";
 import { Dna, Sparkles } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
 import { GlassCard } from "@/components/GlassCard";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { usePageTitle } from "@/hooks/usePageTitle";
@@ -26,7 +25,6 @@ export default function DnaPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         <div>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Personality Analytics</div>

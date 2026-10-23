@@ -15,6 +15,7 @@ import VoiceBuilder from "./pages/VoiceBuilder.tsx";
 import CoverLetter from "./pages/CoverLetter.tsx";
 import Benchmark from "./pages/Benchmark.tsx";
 import VoiceCommand from "./components/VoiceCommand";
+import { AppShell } from "./components/app/AppShell";
 
 const queryClient = new QueryClient();
 
@@ -27,15 +28,18 @@ const App = () => (
         <VoiceCommand />
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/recruiter-sim" element={<RecruiterSim />} />
-          <Route path="/dna" element={<DnaPage />} />
-          <Route path="/copilot" element={<CopilotPage />} />
-          <Route path="/linkedin-sync" element={<LinkedInSync />} />
-          <Route path="/versions" element={<ResumeVersions />} />
-          <Route path="/voice-builder" element={<VoiceBuilder />} />
-          <Route path="/cover-letter" element={<CoverLetter />} />
-          <Route path="/benchmark" element={<Benchmark />} />
+          {/* The 9 app routes render inside the shared AppShell (sidebar/topbar). */}
+          <Route element={<AppShell />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/recruiter-sim" element={<RecruiterSim />} />
+            <Route path="/dna" element={<DnaPage />} />
+            <Route path="/copilot" element={<CopilotPage />} />
+            <Route path="/linkedin-sync" element={<LinkedInSync />} />
+            <Route path="/versions" element={<ResumeVersions />} />
+            <Route path="/voice-builder" element={<VoiceBuilder />} />
+            <Route path="/cover-letter" element={<CoverLetter />} />
+            <Route path="/benchmark" element={<Benchmark />} />
+          </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
