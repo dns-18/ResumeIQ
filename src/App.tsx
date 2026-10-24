@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -14,6 +15,11 @@ import ResumeVersions from "./pages/ResumeVersions.tsx";
 import VoiceBuilder from "./pages/VoiceBuilder.tsx";
 import CoverLetter from "./pages/CoverLetter.tsx";
 import Benchmark from "./pages/Benchmark.tsx";
+// Auth pages are lazy-loaded so the Supabase client (~240 kB) ships in its
+// own chunk, fetched only when visiting /login or /signup — not in the
+// main bundle every visitor downloads.
+const Login = lazy(() => import("./pages/Login.tsx"));
+const Signup = lazy(() => import("./pages/Signup.tsx"));
 import VoiceCommand from "./components/VoiceCommand";
 import { AppShell } from "./components/app/AppShell";
 
@@ -28,6 +34,35 @@ const App = () => (
         <VoiceCommand />
         <Routes>
           <Route path="/" element={<Index />} />
+          {/* Auth pages: shell-free, landing-style layout (route protection is Step 5). */}
+          <Route
+            path="/login"
+            element={
+              <Suspense
+                fallback={
+                  <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+                    Loading…
+                  </div>
+                }
+              >
+                <Login />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <Suspense
+                fallback={
+                  <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+                    Loading…
+                  </div>
+                }
+              >
+                <Signup />
+              </Suspense>
+            }
+          />
           {/* The 9 app routes render inside the shared AppShell (sidebar/topbar). */}
           <Route element={<AppShell />}>
             <Route path="/dashboard" element={<Dashboard />} />
