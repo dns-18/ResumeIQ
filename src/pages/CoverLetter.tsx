@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Sparkles, Copy, Download, RefreshCw, Wand2 } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { GlassCard } from "@/components/GlassCard";
+import { PageHeader } from "@/components/app/PageHeader";
+import { SectionCard } from "@/components/app/SectionCard";
+import { Reveal } from "@/components/app/Reveal";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -44,17 +45,19 @@ export default function CoverLetter() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="text-xs uppercase tracking-widest text-muted-foreground">Cover letter AI</div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold">Tailored. Human-Sounding. In Seconds.</h1>
-          <p className="text-muted-foreground mt-2 max-w-2xl">Drop in the JD — our AI cross-references your resume to write a cover letter that doesn't sound like AI.</p>
-        </motion.div>
+        <Reveal>
+          <PageHeader
+            eyebrow="Cover letter AI"
+            title="Tailored. Human-Sounding. In Seconds."
+            description="Drop in the JD — our AI cross-references your resume to write a cover letter that doesn't sound like AI."
+          />
+        </Reveal>
 
+        <Reveal>
         <div className="grid lg:grid-cols-2 gap-4">
-          <GlassCard glow>
-            <h3 className="font-display text-lg font-semibold flex items-center gap-2 mb-4"><Mail className="h-5 w-5 text-neon-violet" />Job details</h3>
+          <SectionCard glow>
+            <h3 className="font-display text-xl font-semibold flex items-center gap-2 mb-4"><Mail className="h-5 w-5 text-neon-violet" />Job details</h3>
             <div className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Input placeholder="Company" value={company} onChange={(e) => setCompany(e.target.value)} className="glass border-border" />
@@ -76,11 +79,11 @@ export default function CoverLetter() {
                 {loading ? (<><Sparkles className="h-4 w-4 mr-2 animate-pulse" />Crafting…</>) : (<><Wand2 className="h-4 w-4 mr-2" />Generate cover letter</>)}
               </Button>
             </div>
-          </GlassCard>
+          </SectionCard>
 
-          <GlassCard className="flex flex-col">
+          <SectionCard className="flex flex-col">
             <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-3">
-              <h3 className="font-display text-lg font-semibold flex items-center gap-2 min-w-0"><Sparkles className="h-5 w-5 shrink-0 text-neon-pink" />Your letter</h3>
+              <h3 className="font-display text-xl font-semibold flex items-center gap-2 min-w-0"><Sparkles className="h-5 w-5 shrink-0 text-neon-pink" />Your letter</h3>
               {letter && (
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Badge variant="outline" className="text-neon-lime border-neon-lime/40">Human-score: 96%</Badge>
@@ -99,8 +102,9 @@ export default function CoverLetter() {
                 )}
               </AnimatePresence>
             </div>
-          </GlassCard>
+          </SectionCard>
         </div>
+        </Reveal>
       </main>
     </div>
   );

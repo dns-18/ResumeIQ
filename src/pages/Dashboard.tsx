@@ -8,8 +8,9 @@ import {
   TrendingUp, Trophy, Target, Flame, Sparkles, CheckCircle2, AlertTriangle,
   Zap, FileText, Brain, ArrowUpRight, Download
 } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { GlassCard } from "@/components/GlassCard";
+import { PageHeader } from "@/components/app/PageHeader";
+import { Reveal } from "@/components/app/Reveal";
+import { SectionCard } from "@/components/app/SectionCard";
 import { ScoreRing } from "@/components/ScoreRing";
 import { UploadZone } from "@/components/UploadZone";
 import { CopilotPanel } from "@/components/CopilotPanel";
@@ -62,29 +63,33 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">Workspace</div>
-            <h1 className="font-display text-3xl md:text-4xl font-bold">AI Analysis Dashboard</h1>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" className="glass flex-1 border-border sm:flex-none"><Download className="h-4 w-4 mr-2" />Export PDF</Button>
-            <Button className="bg-gradient-aurora animate-aurora flex-1 text-background sm:flex-none"><Sparkles className="h-4 w-4 mr-2" />New analysis</Button>
-          </div>
-        </motion.div>
+        <Reveal>
+          <PageHeader
+            eyebrow="Workspace"
+            title="AI Analysis Dashboard"
+            actions={
+              <>
+                <Button variant="outline" className="glass flex-1 border-border sm:flex-none"><Download className="h-4 w-4 mr-2" />Export PDF</Button>
+                <Button className="bg-gradient-aurora animate-aurora flex-1 text-background sm:flex-none"><Sparkles className="h-4 w-4 mr-2" />New analysis</Button>
+              </>
+            }
+          />
+        </Reveal>
 
         {!analyzed ? (
-          <GlassCard glow className="p-4 sm:p-8">
+          <Reveal delay={0.05}>
+            <SectionCard glow className="p-4 sm:p-8">
             <UploadZone onComplete={() => setAnalyzed(true)} />
-          </GlassCard>
+            </SectionCard>
+          </Reveal>
         ) : (
           <>
             {/* Top grid */}
+            <Reveal>
             <div className="grid lg:grid-cols-3 gap-4">
-              <GlassCard glow className="lg:col-span-1 flex flex-col items-center justify-center">
+              <SectionCard glow className="lg:col-span-1 flex flex-col items-center justify-center">
                 <ScoreRing score={87} />
                 <div className="mt-4 text-center">
                   <div className="text-sm text-muted-foreground">Overall ATS compatibility</div>
@@ -92,12 +97,12 @@ export default function Dashboard() {
                     <TrendingUp className="h-4 w-4" /> +14 since last run
                   </div>
                 </div>
-              </GlassCard>
+              </SectionCard>
 
-              <GlassCard className="lg:col-span-2">
+              <SectionCard className="lg:col-span-2">
                 <div className="flex items-center justify-between mb-2">
                   <div>
-                    <div className="text-xs uppercase tracking-widest text-muted-foreground">Resume Personality DNA</div>
+                    <div className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Resume Personality DNA</div>
                     <h3 className="font-display text-xl font-semibold mt-1">Strategic Leader · Analytical Builder</h3>
                   </div>
                   <Badge className="bg-gradient-aurora animate-aurora text-background border-0">DNA</Badge>
@@ -112,12 +117,14 @@ export default function Dashboard() {
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>
-              </GlassCard>
+              </SectionCard>
             </div>
+            </Reveal>
 
             {/* Insights + ATS bars */}
+            <Reveal delay={0.05}>
             <div className="grid lg:grid-cols-3 gap-4">
-              <GlassCard className="lg:col-span-2">
+              <SectionCard className="lg:col-span-2">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-display text-xl font-semibold flex items-center gap-2"><Shield className="h-5 w-5 text-neon-cyan" />ATS Battlefield</h3>
                   <span className="text-xs text-muted-foreground">5 engines compared</span>
@@ -139,9 +146,9 @@ export default function Dashboard() {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-              </GlassCard>
+              </SectionCard>
 
-              <GlassCard>
+              <SectionCard>
                 <h3 className="font-display text-xl font-semibold flex items-center gap-2 mb-4"><Brain className="h-5 w-5 text-neon-pink" />AI Insights</h3>
                 <div className="space-y-2.5">
                   {insights.map((i, idx) => (
@@ -157,12 +164,14 @@ export default function Dashboard() {
                     </motion.div>
                   ))}
                 </div>
-              </GlassCard>
+              </SectionCard>
             </div>
+            </Reveal>
 
             {/* Skill trend + interview + gamification */}
+            <Reveal delay={0.1}>
             <div className="grid lg:grid-cols-3 gap-4">
-              <GlassCard className="lg:col-span-2">
+              <SectionCard className="lg:col-span-2">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-display text-xl font-semibold flex items-center gap-2"><TrendingUp className="h-5 w-5 text-neon-lime" />Skill Gap Forecast</h3>
                   <span className="text-xs text-muted-foreground">Next 6 months</span>
@@ -189,9 +198,9 @@ export default function Dashboard() {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
-              </GlassCard>
+              </SectionCard>
 
-              <GlassCard>
+              <SectionCard>
                 <h3 className="font-display text-xl font-semibold flex items-center gap-2 mb-1"><Target className="h-5 w-5 text-neon-cyan" />Interview Predictor</h3>
                 <p className="text-xs text-muted-foreground mb-4">Callback probability for "Senior PM @ Google"</p>
                 <div className="text-5xl font-display font-bold text-gradient">73%</div>
@@ -204,11 +213,13 @@ export default function Dashboard() {
                     Run recruiter sim <ArrowUpRight className="h-3 w-3" />
                   </Link>
                 </div>
-              </GlassCard>
+              </SectionCard>
             </div>
+            </Reveal>
 
             {/* Gamification */}
-            <GlassCard>
+            <Reveal delay={0.05}>
+            <SectionCard>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-display text-xl font-semibold flex items-center gap-2"><Trophy className="h-5 w-5 text-neon-amber" />Career Progression</h3>
                 <div className="flex items-center gap-4 text-sm">
@@ -234,25 +245,28 @@ export default function Dashboard() {
                   </motion.div>
                 ))}
               </div>
-            </GlassCard>
+            </SectionCard>
+            </Reveal>
 
+            <Reveal delay={0.1}>
             <div className="grid md:grid-cols-3 gap-4">
-              <Link to="/recruiter-sim"><GlassCard className="hover:shadow-elevated cursor-pointer h-full">
+              <Link to="/recruiter-sim"><SectionCard interactive className="cursor-pointer h-full">
                 <FileText className="h-6 w-6 text-neon-violet mb-2" />
                 <div className="font-display font-semibold">Recruiter Simulation</div>
                 <p className="text-sm text-muted-foreground mt-1">See the 6-second scan with heatmap & AI commentary.</p>
-              </GlassCard></Link>
-              <Link to="/dna"><GlassCard className="hover:shadow-elevated cursor-pointer h-full">
+              </SectionCard></Link>
+              <Link to="/dna"><SectionCard interactive className="cursor-pointer h-full">
                 <Brain className="h-6 w-6 text-neon-cyan mb-2" />
                 <div className="font-display font-semibold">Resume DNA</div>
                 <p className="text-sm text-muted-foreground mt-1">Decode tone, leadership, recruiter perception.</p>
-              </GlassCard></Link>
-              <Link to="/copilot"><GlassCard className="hover:shadow-elevated cursor-pointer h-full">
+              </SectionCard></Link>
+              <Link to="/copilot"><SectionCard interactive className="cursor-pointer h-full">
                 <Sparkles className="h-6 w-6 text-neon-pink mb-2" />
                 <div className="font-display font-semibold">Rewrite Studio</div>
                 <p className="text-sm text-muted-foreground mt-1">Inline AI suggestions on every line.</p>
-              </GlassCard></Link>
+              </SectionCard></Link>
             </div>
+            </Reveal>
           </>
         )}
       </main>

@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from "recharts";
 import { TrendingUp, Trophy, Users, Sparkles, ArrowUpRight, Target } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { GlassCard } from "@/components/GlassCard";
+import { PageHeader } from "@/components/app/PageHeader";
+import { SectionCard } from "@/components/app/SectionCard";
+import { Reveal } from "@/components/app/Reveal";
 import { Badge } from "@/components/ui/badge";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
@@ -28,33 +29,37 @@ export default function Benchmark() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="text-xs uppercase tracking-widest text-muted-foreground">Anonymized benchmark</div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold">Where you stand vs the top 10%</h1>
-          <p className="text-muted-foreground mt-2 max-w-2xl">Compared against <span className="text-neon-cyan font-mono">100</span> anonymized candidates applying for <span className="text-foreground font-semibold">Senior Product Manager @ FAANG</span>.</p>
-        </motion.div>
+        <Reveal>
+          <PageHeader
+            eyebrow="Anonymized benchmark"
+            title="Where you stand vs the top 10%"
+            description={<>Compared against <span className="text-neon-cyan font-mono">100</span> anonymized candidates applying for <span className="text-foreground font-semibold">Senior Product Manager @ FAANG</span>.</>}
+          />
+        </Reveal>
 
+        <Reveal>
         <div className="grid md:grid-cols-3 gap-4">
-          <GlassCard glow>
-            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground"><Trophy className="h-4 w-4 text-neon-amber" />Your rank</div>
+          <SectionCard glow>
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-muted-foreground"><Trophy className="h-4 w-4 text-neon-amber" />Your rank</div>
             <div className="font-display text-5xl font-bold text-gradient mt-2">Top 18%</div>
             <div className="mt-2 text-sm text-neon-lime flex items-center gap-1"><ArrowUpRight className="h-3 w-3" />Better than 82 of 100 candidates</div>
-          </GlassCard>
-          <GlassCard>
-            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground"><Users className="h-4 w-4 text-neon-cyan" />Your score</div>
+          </SectionCard>
+          <SectionCard>
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-muted-foreground"><Users className="h-4 w-4 text-neon-cyan" />Your score</div>
             <div className="font-display text-5xl font-bold mt-2">87</div>
             <div className="mt-2 text-sm text-muted-foreground">Top 10% avg: <span className="text-neon-lime font-mono">93</span> · cohort avg: <span className="font-mono">72</span></div>
-          </GlassCard>
-          <GlassCard>
-            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground"><Target className="h-4 w-4 text-neon-pink" />Gap to top 10%</div>
+          </SectionCard>
+          <SectionCard>
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-muted-foreground"><Target className="h-4 w-4 text-neon-pink" />Gap to top 10%</div>
             <div className="font-display text-5xl font-bold mt-2">6 pts</div>
             <div className="mt-2 text-sm text-muted-foreground">Close it with 3 high-impact rewrites</div>
-          </GlassCard>
+          </SectionCard>
         </div>
+        </Reveal>
 
-        <GlassCard>
+        <Reveal>
+        <SectionCard>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display text-xl font-semibold flex items-center gap-2"><Users className="h-5 w-5 text-neon-violet" />Score distribution (anonymized cohort)</h3>
             <Badge className="bg-gradient-aurora animate-aurora text-background border-0">You're here</Badge>
@@ -72,9 +77,11 @@ export default function Benchmark() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </GlassCard>
+        </SectionCard>
+        </Reveal>
 
-        <GlassCard>
+        <Reveal>
+        <SectionCard>
           <h3 className="font-display text-xl font-semibold flex items-center gap-2 mb-5"><TrendingUp className="h-5 w-5 text-neon-lime" />Metric-by-metric breakdown</h3>
           <div className="space-y-4">
             {metrics.map((m, i) => {
@@ -101,7 +108,8 @@ export default function Benchmark() {
               <p className="text-muted-foreground">Add 4 more quantified bullets and integrate 4 missing skills (Roadmapping, OKRs, A/B Testing, SQL) to break into the top 10%.</p>
             </div>
           </div>
-        </GlassCard>
+        </SectionCard>
+        </Reveal>
       </main>
     </div>
   );

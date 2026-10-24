@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { Radar, RadarChart, PolarAngleAxis, PolarGrid, ResponsiveContainer } from "recharts";
 import { Dna, Sparkles } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { GlassCard } from "@/components/GlassCard";
+import { PageHeader } from "@/components/app/PageHeader";
+import { Reveal } from "@/components/app/Reveal";
+import { SectionCard } from "@/components/app/SectionCard";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
@@ -26,19 +27,20 @@ export default function DnaPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
-        <div>
-          <div className="text-xs uppercase tracking-widest text-muted-foreground">Personality Analytics</div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold flex items-center gap-3">
-            <Dna className="h-8 w-8 text-neon-pink" /> Resume Personality DNA
-          </h1>
-          <p className="text-muted-foreground mt-1">How recruiters subconsciously perceive your communication style.</p>
-        </div>
+        <Reveal>
+          <PageHeader
+            eyebrow="Personality Analytics"
+            icon={<Dna className="h-8 w-8 text-neon-pink" />}
+            title="Resume Personality DNA"
+            description="How recruiters subconsciously perceive your communication style."
+          />
+        </Reveal>
 
+        <Reveal delay={0.05}>
         <div className="grid lg:grid-cols-2 gap-4">
-          <GlassCard glow>
-            <h3 className="font-display font-semibold mb-2">Trait signature</h3>
+          <SectionCard glow>
+            <h3 className="font-display text-xl font-semibold mb-2">Trait signature</h3>
             <div className="h-[360px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={traits}>
@@ -48,10 +50,10 @@ export default function DnaPage() {
                 </RadarChart>
               </ResponsiveContainer>
             </div>
-          </GlassCard>
+          </SectionCard>
 
-          <GlassCard>
-            <h3 className="font-display font-semibold mb-4">Archetype match</h3>
+          <SectionCard>
+            <h3 className="font-display text-xl font-semibold mb-4">Archetype match</h3>
             <div className="space-y-4">
               {archetypes.map((a, i) => (
                 <div key={a.name}>
@@ -70,18 +72,21 @@ export default function DnaPage() {
                 </div>
               ))}
             </div>
-          </GlassCard>
+          </SectionCard>
         </div>
+        </Reveal>
 
-        <GlassCard>
-          <h3 className="font-display font-semibold mb-3 flex items-center gap-2"><Sparkles className="h-4 w-4 text-neon-violet" />Recruiter perception</h3>
+        <Reveal delay={0.1}>
+        <SectionCard>
+          <h3 className="font-display text-xl font-semibold mb-3 flex items-center gap-2"><Sparkles className="h-4 w-4 text-neon-violet" />Recruiter perception</h3>
           <p className="text-muted-foreground leading-relaxed">
             Your resume reads as a <span className="text-foreground font-medium">decisive, outcome-driven operator</span> with a calm, executive tone.
             Quantified impact and crisp verbs project confidence. To unlock higher-tier roles, lean further into vision-setting language —
             recruiters scanning for VP+ candidates respond to phrases like <span className="font-mono text-neon-cyan">"set the roadmap"</span> and
             <span className="font-mono text-neon-cyan"> "aligned 4 orgs around"</span>.
           </p>
-        </GlassCard>
+        </SectionCard>
+        </Reveal>
       </main>
       <CopilotPanel />
     </div>

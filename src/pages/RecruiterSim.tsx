@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, Play, RefreshCw, Sparkles } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { GlassCard } from "@/components/GlassCard";
+import { PageHeader } from "@/components/app/PageHeader";
+import { Reveal } from "@/components/app/Reveal";
+import { SectionCard } from "@/components/app/SectionCard";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { Button } from "@/components/ui/button";
 import { ScoreRing } from "@/components/ScoreRing";
@@ -31,23 +32,24 @@ export default function RecruiterSim() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">Unique Feature</div>
-            <h1 className="font-display text-3xl md:text-4xl font-bold flex items-center gap-3">
-              <Eye className="h-8 w-8 text-neon-cyan" /> Recruiter Simulation
-            </h1>
-            <p className="text-muted-foreground mt-1">Watch how a real recruiter scans your resume in 6 seconds.</p>
-          </div>
-          <Button onClick={start} disabled={running} className="bg-gradient-aurora animate-aurora text-background">
-            {running ? <><RefreshCw className="h-4 w-4 mr-2 animate-spin" />Scanning…</> : <><Play className="h-4 w-4 mr-2" />Replay scan</>}
-          </Button>
-        </div>
+        <Reveal>
+          <PageHeader
+            eyebrow="Unique Feature"
+            icon={<Eye className="h-8 w-8 text-neon-cyan" />}
+            title="Recruiter Simulation"
+            description="Watch how a real recruiter scans your resume in 6 seconds."
+            actions={
+              <Button onClick={start} disabled={running} className="bg-gradient-aurora animate-aurora text-background">
+                {running ? <><RefreshCw className="h-4 w-4 mr-2 animate-spin" />Scanning…</> : <><Play className="h-4 w-4 mr-2" />Replay scan</>}
+              </Button>
+            }
+          />
+        </Reveal>
 
+        <Reveal delay={0.05}>
         <div className="grid lg:grid-cols-3 gap-4">
-          <GlassCard glow className="lg:col-span-2 p-4">
+          <SectionCard glow className="lg:col-span-2 p-4">
             <div className="relative aspect-[4/5] rounded-xl bg-secondary/40 overflow-hidden border border-border">
               {/* fake resume mock */}
               {sections.map((s) => (
@@ -99,15 +101,15 @@ export default function RecruiterSim() {
                 )}
               </AnimatePresence>
             </div>
-          </GlassCard>
+          </SectionCard>
 
           <div className="space-y-4">
-            <GlassCard className="text-center">
-              <div className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Recruiter confidence</div>
+            <SectionCard className="text-center">
+              <div className="text-xs uppercase tracking-[0.28em] text-muted-foreground mb-2">Recruiter confidence</div>
               <ScoreRing score={78} size={140} label="Confidence" />
-            </GlassCard>
-            <GlassCard>
-              <h3 className="font-display font-semibold mb-3 flex items-center gap-2"><Sparkles className="h-4 w-4 text-neon-violet" />Live AI commentary</h3>
+            </SectionCard>
+            <SectionCard>
+              <h3 className="font-display text-xl font-semibold mb-3 flex items-center gap-2"><Sparkles className="h-4 w-4 text-neon-violet" />Live AI commentary</h3>
               <div className="space-y-2.5 max-h-[280px] overflow-y-auto">
                 {sections.map((s, i) => step >= i && (
                   <motion.div
@@ -123,9 +125,10 @@ export default function RecruiterSim() {
                   </motion.div>
                 ))}
               </div>
-            </GlassCard>
+            </SectionCard>
           </div>
         </div>
+        </Reveal>
       </main>
       <CopilotPanel />
     </div>

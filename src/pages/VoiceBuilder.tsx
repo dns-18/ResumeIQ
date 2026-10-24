@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, FileText, Mic, MicOff, RefreshCw, Sparkles, Wand2 } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { GlassCard } from "@/components/GlassCard";
+import { PageHeader } from "@/components/app/PageHeader";
+import { SectionCard } from "@/components/app/SectionCard";
+import { Reveal } from "@/components/app/Reveal";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
@@ -175,28 +176,30 @@ export default function VoiceBuilder() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
       <main className="mx-auto max-w-7xl space-y-6 px-4 pt-8 pb-28 md:py-8">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="text-xs uppercase tracking-widest text-muted-foreground">No typing required</div>
-          <h1 className="font-display text-3xl font-bold md:text-4xl">Voice Resume Builder</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            Speak naturally about your work. ResumeIQ turns it into a recruiter-ready, ATS-friendly resume draft.
-          </p>
-        </motion.div>
+        <Reveal>
+          <PageHeader
+            eyebrow="No typing required"
+            title="Voice Resume Builder"
+            description="Speak naturally about your work. ResumeIQ turns it into a recruiter-ready, ATS-friendly resume draft."
+          />
+        </Reveal>
 
         {!supported && (
-          <GlassCard>
+          <Reveal>
+          <SectionCard>
             <p className="text-sm text-neon-amber">
               Voice input is not supported in this browser. Type your career story below and generate normally.
             </p>
-          </GlassCard>
+          </SectionCard>
+          </Reveal>
         )}
 
+        <Reveal>
         <div className="grid gap-4 lg:grid-cols-2">
-          <GlassCard glow className="flex flex-col">
+          <SectionCard glow className="flex flex-col">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-display flex items-center gap-2 text-lg font-semibold">
+              <h3 className="font-display flex items-center gap-2 text-xl font-semibold">
                 <Mic className="h-5 w-5 text-neon-pink" />
                 Speak your story
               </h3>
@@ -225,7 +228,7 @@ export default function VoiceBuilder() {
             </div>
 
             <Textarea
-              className="min-h-[190px] resize-none border-border bg-secondary/40 text-sm"
+              className="min-h-[190px] resize-none border-border bg-secondary/40"
               onChange={(event) => setTranscript(event.target.value)}
               placeholder="Example: I am a product manager with 6 years of experience. I led a $4M launch, improved activation by 24%, and managed teams across design, engineering, and data."
               value={transcript}
@@ -251,11 +254,11 @@ export default function VoiceBuilder() {
                 )}
               </Button>
             </div>
-          </GlassCard>
+          </SectionCard>
 
-          <GlassCard className="flex flex-col">
+          <SectionCard className="flex flex-col">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-display flex items-center gap-2 text-lg font-semibold">
+              <h3 className="font-display flex items-center gap-2 text-xl font-semibold">
                 <FileText className="h-5 w-5 text-neon-cyan" />
                 AI-formatted resume
               </h3>
@@ -281,8 +284,9 @@ export default function VoiceBuilder() {
                 )}
               </AnimatePresence>
             </div>
-          </GlassCard>
+          </SectionCard>
         </div>
+        </Reveal>
       </main>
     </div>
   );
