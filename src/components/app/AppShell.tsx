@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Dna,
   Eye,
@@ -6,16 +6,25 @@ import {
   Layers,
   LayoutDashboard,
   Linkedin,
+  LogOut,
   Menu,
   Mic,
   Sparkles,
   TrendingUp,
-  User,
   type LucideIcon,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { cn } from "@/lib/utils";
 
 type NavItem = { to: string; label: string; title: string; icon: LucideIcon };
@@ -34,29 +43,59 @@ const APP_NAV: NavItem[] = [
 ];
 
 /**
- * Reserved slot for the account menu (Phase 2, Step 5 wires real Supabase
- * auth into this). Deliberately inert — no fake menus or actions.
+ * Real account menu (Phase 2, Step 5). AppShell only renders inside the
+ * protected layout, so a user is always present; the null guard is
+ * defensive only. Lives in the lazy protected chunk, so the Supabase
+ * import behind useAuth never enters the main bundle.
  */
-const AccountSlot = ({ compact = false }: { compact?: boolean }) => (
-  <div
-    aria-disabled="true"
-    title="Account — sign-in arrives with the auth step"
-    className={cn(
-      "flex cursor-not-allowed items-center gap-3 rounded-full border border-white/10 bg-white/5 opacity-60 select-none",
-      compact ? "p-1.5" : "w-full px-2 py-2"
-    )}
-  >
-    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground">
-      <User className="h-4 w-4" />
-    </span>
-    {!compact && (
-      <span className="min-w-0 leading-tight">
-        <span className="block truncate text-sm font-medium text-foreground">Account</span>
-        <span className="block truncate text-xs text-muted-foreground">Not signed in</span>
-      </span>
-    )}
-  </div>
-);
+const AccountMenu = ({ compact = false }: { compact?: boolean }) => {
+  const { user, displayName, signOut } = useAuth();
+  const navigate = useNavigate();
+  const initial = (displayName?.[0] ?? "A").toUpperCase();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login", { replace: true });
+  };
+
+  if (!user) return null;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          aria-label="Account menu"
+          className={cn(
+            "flex items-center gap-3 rounded-full border border-white/10 bg-white/5 transition-colors hover:bg-white/10",
+            compact ? "p-1.5" : "w-full px-2 py-2 text-left"
+          )}
+        >
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-aurora text-sm font-semibold text-background">
+            {initial}
+          </span>
+          {!compact && (
+            <span className="min-w-0 leading-tight">
+              <span className="block truncate text-sm font-medium text-foreground">{displayName}</span>
+              <span className="block truncate text-xs text-muted-foreground">{user.email}</span>
+            </span>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>
+          <span className="block truncate">{displayName}</span>
+          <span className="block truncate text-xs font-normal text-muted-foreground">{user.email}</span>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleSignOut}>
+          <LogOut className="h-4 w-4" />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 const SidebarNav = ({ inSheet = false }: { inSheet?: boolean }) => (
   <nav className="flex flex-col gap-1">
@@ -127,7 +166,7 @@ export const AppShell = () => {
           <SidebarNav />
         </div>
         <div className="border-t border-white/10 p-4">
-          <AccountSlot />
+          <AccountMenu />
         </div>
       </aside>
 
@@ -150,13 +189,13 @@ export const AppShell = () => {
                   <SidebarNav inSheet />
                 </div>
                 <div className="border-t border-white/10 p-4">
-                  <AccountSlot />
+                  <AccountMenu />
                 </div>
               </SheetContent>
             </Sheet>
             <h1 className="font-display text-lg font-semibold tracking-tight">{title}</h1>
             <div className="ml-auto">
-              <AccountSlot compact />
+              <AccountMenu compact />
             </div>
           </div>
         </header>

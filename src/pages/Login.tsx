@@ -18,13 +18,15 @@ const friendlyLoginError = (message: string) =>
     ? "Email or password is incorrect."
     : message;
 
-type LocationState = { from?: { pathname: string } } | null;
+type LocationState = { from?: { pathname: string }; notice?: string } | null;
 
 const Login = () => {
   usePageTitle("Sign in · ResumeIQ");
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = (location.state as LocationState)?.from?.pathname ?? "/dashboard";
+  // Set by /reset-password after a successful password update.
+  const notice = (location.state as LocationState)?.notice ?? null;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -118,6 +120,18 @@ const Login = () => {
             </button>
           </div>
         </div>
+
+        <div className="flex justify-end">
+          <Link to="/forgot-password" className="text-sm font-medium text-muted-foreground underline underline-offset-4 hover:text-foreground">
+            Forgot password?
+          </Link>
+        </div>
+
+        {notice && (
+          <p role="status" className="rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 text-sm leading-relaxed text-emerald-300">
+            {notice}
+          </p>
+        )}
 
         {error && (
           <p role="alert" className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm leading-relaxed text-destructive">
