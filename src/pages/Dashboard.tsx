@@ -102,7 +102,7 @@ export default function Dashboard() {
               <SectionCard className="lg:col-span-2">
                 <div className="flex items-center justify-between mb-2">
                   <div>
-                    <div className="text-xs uppercase tracking-widest text-muted-foreground">Resume Personality DNA</div>
+                    <div className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Resume Personality DNA</div>
                     <h3 className="font-display text-xl font-semibold mt-1">Strategic Leader · Analytical Builder</h3>
                   </div>
                   <Badge className="bg-gradient-aurora animate-aurora text-background border-0">DNA</Badge>
