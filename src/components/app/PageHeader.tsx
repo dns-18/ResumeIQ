@@ -7,7 +7,8 @@ type PageHeaderProps = {
   /** Optional leading title icon (e.g. a lucide icon with a neon tint), as on the tool pages. */
   icon?: ReactNode;
   title: string;
-  description?: string;
+  /** Rich description (plain string or inline JSX, e.g. Benchmark's highlighted spans). */
+  description?: ReactNode;
   /** Buttons/links rendered on the right; wraps below the title on small screens. */
   actions?: ReactNode;
   className?: string;

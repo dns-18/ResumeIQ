@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Linkedin, FileText, ArrowRight, CheckCircle2, AlertTriangle, Plus, Sparkles, Link2, RefreshCw } from "lucide-react";
-import { GlassCard } from "@/components/GlassCard";
+import { PageHeader } from "@/components/app/PageHeader";
+import { SectionCard } from "@/components/app/SectionCard";
+import { Reveal } from "@/components/app/Reveal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { usePageTitle } from "@/hooks/usePageTitle";
@@ -27,14 +29,17 @@ export default function LinkedInSync() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="text-xs uppercase tracking-widest text-muted-foreground">Profile sync</div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold">LinkedIn × Resume Gap Analysis</h1>
-          <p className="text-muted-foreground mt-2 max-w-2xl">Connect your LinkedIn to surface inconsistencies, missing achievements, and one-click imports between your two career artifacts.</p>
-        </motion.div>
+        <Reveal>
+          <PageHeader
+            eyebrow="Profile sync"
+            title="LinkedIn × Resume Gap Analysis"
+            description="Connect your LinkedIn to surface inconsistencies, missing achievements, and one-click imports between your two career artifacts."
+          />
+        </Reveal>
 
         {!connected ? (
-          <GlassCard glow className="p-10 text-center">
+          <Reveal>
+          <SectionCard glow className="p-10 text-center">
             <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-aurora animate-aurora flex items-center justify-center shadow-neon mb-4">
               <Linkedin className="h-8 w-8 text-background" />
             </div>
@@ -44,28 +49,32 @@ export default function LinkedInSync() {
               {syncing ? (<><RefreshCw className="h-4 w-4 mr-2 animate-spin" />Syncing…</>) : (<><Link2 className="h-4 w-4 mr-2" />Connect LinkedIn</>)}
             </Button>
             <div className="mt-4 text-xs text-muted-foreground">Read-only · Revoke any time</div>
-          </GlassCard>
+          </SectionCard>
+          </Reveal>
         ) : (
           <>
+            <Reveal>
             <div className="grid md:grid-cols-3 gap-4">
               {[
                 { label: "Alignment score", value: "72%", sub: "+18 if all gaps fixed", color: "text-neon-cyan" },
                 { label: "Gaps detected", value: "5", sub: "3 high impact", color: "text-neon-amber" },
                 { label: "One-click imports", value: "8", sub: "Ready to apply", color: "text-neon-lime" },
               ].map((s) => (
-                <GlassCard key={s.label}>
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground">{s.label}</div>
+                <SectionCard key={s.label}>
+                  <div className="text-xs uppercase tracking-[0.28em] text-muted-foreground">{s.label}</div>
                   <div className={`font-display text-4xl font-bold mt-1 ${s.color}`}>{s.value}</div>
                   <div className="text-xs text-muted-foreground mt-1">{s.sub}</div>
-                </GlassCard>
+                </SectionCard>
               ))}
             </div>
+            </Reveal>
 
+            <Reveal>
             <div className="grid md:grid-cols-2 gap-4">
-              <GlassCard>
+              <SectionCard>
                 <div className="flex items-center gap-2 mb-3">
                   <FileText className="h-5 w-5 text-neon-violet" />
-                  <h3 className="font-display text-lg font-semibold">Resume</h3>
+                  <h3 className="font-display text-xl font-semibold">Resume</h3>
                   <Badge variant="outline" className="ml-auto">v3 · uploaded today</Badge>
                 </div>
                 <ul className="space-y-2 text-sm">
@@ -73,11 +82,11 @@ export default function LinkedInSync() {
                   <li className="p-2.5 rounded-lg bg-secondary/40">Led $4M product launch (+38% MAU)</li>
                   <li className="p-2.5 rounded-lg bg-secondary/40">Managed 6-person cross-functional team</li>
                 </ul>
-              </GlassCard>
-              <GlassCard>
+              </SectionCard>
+              <SectionCard>
                 <div className="flex items-center gap-2 mb-3">
                   <Linkedin className="h-5 w-5 text-neon-cyan" />
-                  <h3 className="font-display text-lg font-semibold">LinkedIn</h3>
+                  <h3 className="font-display text-xl font-semibold">LinkedIn</h3>
                   <Badge variant="outline" className="ml-auto">synced just now</Badge>
                 </div>
                 <ul className="space-y-2 text-sm">
@@ -85,10 +94,12 @@ export default function LinkedInSync() {
                   <li className="p-2.5 rounded-lg bg-secondary/40">Product Manager · Acme · 2022–2024</li>
                   <li className="p-2.5 rounded-lg bg-secondary/40">12 endorsed skills · 4 recommendations</li>
                 </ul>
-              </GlassCard>
+              </SectionCard>
             </div>
+            </Reveal>
 
-            <GlassCard>
+            <Reveal>
+            <SectionCard>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-display text-xl font-semibold flex items-center gap-2"><Sparkles className="h-5 w-5 text-neon-pink" />Detected gaps & suggestions</h3>
                 <Button size="sm" className="bg-gradient-aurora animate-aurora text-background h-10 shrink-0"><Plus className="h-4 w-4 mr-1" />Import all</Button>
@@ -107,7 +118,8 @@ export default function LinkedInSync() {
                   </motion.div>
                 ))}
               </div>
-            </GlassCard>
+            </SectionCard>
+            </Reveal>
           </>
         )}
       </main>

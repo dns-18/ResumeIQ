@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Plus, Copy, Trash2, Star, Trophy, FileText, Target, TrendingUp } from "lucide-react";
-import { GlassCard } from "@/components/GlassCard";
+import { PageHeader } from "@/components/app/PageHeader";
+import { SectionCard } from "@/components/app/SectionCard";
+import { Reveal } from "@/components/app/Reveal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { usePageTitle } from "@/hooks/usePageTitle";
@@ -34,21 +35,21 @@ export default function ResumeVersions() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="mx-auto max-w-7xl px-4 pt-8 pb-28 md:py-8 space-y-6">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">Resume vault</div>
-            <h1 className="font-display text-3xl md:text-4xl font-bold">Multi-Version Manager</h1>
-            <p className="text-muted-foreground mt-1">Tailor a resume per role · Track which version converts best.</p>
-          </div>
-          <Button className="bg-gradient-aurora animate-aurora text-background"><Plus className="h-4 w-4 mr-2" />New version</Button>
-        </motion.div>
+        <Reveal>
+          <PageHeader
+            eyebrow="Resume vault"
+            title="Multi-Version Manager"
+            description="Tailor a resume per role · Track which version converts best."
+            actions={<Button className="bg-gradient-aurora animate-aurora text-background"><Plus className="h-4 w-4 mr-2" />New version</Button>}
+          />
+        </Reveal>
 
         <div className="grid lg:grid-cols-3 gap-4">
           {versions.map((v, i) => {
             const isSelected = selected.includes(v.id);
             return (
-              <motion.div key={v.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                <GlassCard glow={v.best} className={`h-full transition-all cursor-pointer ${isSelected ? "ring-2 ring-neon-cyan" : ""}`}>
+              <Reveal key={v.id} delay={i * 0.05}>
+                <SectionCard glow={v.best} interactive className={`h-full transition-all cursor-pointer ${isSelected ? "ring-2 ring-neon-cyan" : ""}`}>
                   <div className="flex items-start justify-between mb-3" onClick={() => toggle(v.id)}>
                     <div>
                       <div className="flex items-center gap-2">
@@ -84,13 +85,14 @@ export default function ResumeVersions() {
                       <Button size="sm" variant="ghost" className="h-10 w-10" aria-label="Delete version" onClick={() => remove(v.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                     </div>
                   </div>
-                </GlassCard>
-              </motion.div>
+                </SectionCard>
+              </Reveal>
             );
           })}
         </div>
 
-        <GlassCard>
+        <Reveal>
+        <SectionCard>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display text-xl font-semibold flex items-center gap-2"><Target className="h-5 w-5 text-neon-cyan" />Comparison Dashboard</h3>
             <span className="text-xs text-muted-foreground">Select up to 3 versions · {compared.length} selected</span>
@@ -137,7 +139,8 @@ export default function ResumeVersions() {
               </div>
             </div>
           )}
-        </GlassCard>
+        </SectionCard>
+        </Reveal>
       </main>
     </div>
   );
