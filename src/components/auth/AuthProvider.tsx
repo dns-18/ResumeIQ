@@ -1,24 +1,7 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { Session, User } from "@supabase/supabase-js";
+import { useEffect, useState, type ReactNode } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "@/lib/supabase";
-
-export type AuthContextValue = {
-  user: User | null;
-  session: Session | null;
-  /** user_metadata.display_name, falling back to the email prefix. */
-  displayName: string;
-  loading: boolean;
-  configured: boolean;
-  signOut: () => Promise<void>;
-};
-
-const AuthContext = createContext<AuthContextValue | null>(null);
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
-};
+import { AuthContext } from "./auth-context";
 
 /**
  * Session provider for the protected app routes. Lives inside the lazy

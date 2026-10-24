@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from "@/components/auth/AuthProvider";
+import { useAuth } from "@/components/auth/auth-context";
 import { cn } from "@/lib/utils";
 
 type NavItem = { to: string; label: string; title: string; icon: LucideIcon };
@@ -131,7 +131,7 @@ const SidebarNav = ({ inSheet = false }: { inSheet?: boolean }) => (
         </NavLink>
       );
       // Inside the mobile Sheet, tapping a link must also close the sheet
-      // (same SheetClose pattern the Phase 1 Navbar used).
+      // (same SheetClose pattern the Phase 1 mobile menus used).
       return inSheet ? (
         <SheetClose asChild key={to}>
           {link}
